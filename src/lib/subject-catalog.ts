@@ -39,6 +39,12 @@ export const subjects: Subject[] = [
         status: "available",
       },
       {
+        title: "Data, Features, and Labels",
+        description: "Inspect an editable dataset, select features, and train a small classifier.",
+        href: "/learn/ml/data-features-and-labels",
+        status: "available",
+      },
+      {
         title: "Gradient Descent",
         description: "See how optimization moves toward lower loss — one step at a time.",
         href: "/learn/ml/gradient-descent",

@@ -1,0 +1,133 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import DatasetStudioLab from "@/components/labs/DatasetStudioLab";
+import DataFeaturesQuiz from "@/components/learning/DataFeaturesQuiz";
+
+## Every Dataset Tells a Story
+
+Before a machine learning model can make predictions, it needs **data**. But “data” isn't simply a long list of numbers. A dataset has a structure: **observations**, **measurements**, and sometimes **answers we want the model to learn**.
+
+Imagine a small greenhouse. For each plant, you record how much water it receives, how many hours of sunlight it gets, the material of its pot, and whether the plant is thriving. These observations form a table. Each row describes one plant, while each column describes one attribute.
+
+The goal of this lesson is to be able to answer three questions about any ML dataset:
+
+1. **What is one example?** A row, also called a *sample* or *instance*.
+2. **What does the model receive?** One or more *input features*.
+3. **What must the model predict?** The *target*, also called a *label* in supervised learning.
+
+Géron uses the same distinction between instances, features, and targets when introducing supervised learning (Chapter 1) and when examining the California housing dataset (Chapter 2).
+
+## From Rows to Predictions
+
+Consider these *fictional* plant records:
+
+| Plant | Water (L/week) | Sunlight (h/day) | Pot material | Health |
+| --- | ---: | ---: | --- | --- |
+| A | 1.2 | 4.1 | Plastic | Struggling |
+| B | 2.4 | 5.1 | Plastic | Thriving |
+| C | 3.5 | 8.8 | Clay | Thriving |
+
+If our goal is to predict whether a **new plant** is thriving, we use observations such as **water** and **sunlight** as features. We treat the recorded **health** as the target. The model studies examples with known health outcomes and tries to predict the outcome for a new plant.
+
+A crucial distinction: a model must **not** receive the true health of the new plant as an input. That would be handing it the answer instead of asking it to learn.
+
+<LessonWorkbench lab={<DatasetStudioLab />} name="Dataset Studio — Data, Features, and Labels">
+
+## Interactive Experiment: Dataset Studio
+
+On the right is an editable dataset of fictional plants. The lab uses a simple **3-nearest-neighbors** classifier so that you can see exactly which samples affect a prediction. Unlike a professional horticultural prediction system, its data is invented solely to teach dataset concepts.
+
+### 01 — Identify one sample
+
+Select any dot on the chart or click its row number in the dataset. You have selected **one observation**. Notice that its row contains *several attributes*, but it still counts as only one sample.
+
+### 02 — Choose your input features
+
+The checkboxes let you select **water**, **sunlight**, or both. Click **Train on labeled data**, then click a location in the plot to move the new, unknown plant. Try training with only one feature and compare the prediction with both features selected.
+
+The plotted axes always show water and sunlight. The checkbox selection changes only which measurements are used when the model compares examples. The distance is normalized by each feature's displayed range so the unit scales do not dominate the result.
+
+### 03 — Separate inputs from the target
+
+The right panel marks **Plant health** as the target. Its values are excluded from neighbor distances. During training, the labels tell the classifier which category each nearby training sample belongs to.
+
+Turn on **Hide all target labels**. The dots lose their category colors, and supervised training is disabled. Without the correct answers, you could still analyze positions or look for clusters, but you could not train this particular *supervised* classifier.
+
+### 04 — Change the evidence
+
+Turn labels back on. Flip a plant's label or change its water measurement in the table. The old training snapshot is cleared until you train again. This illustrates the difference between **changing raw data** and **training a model on the updated data**.
+
+### 05 — Add your own sample
+
+Place the cross on the chart, select a health label under the table, and choose **Add test point as labeled sample**. Retrain. Observe whether the new example changes the three nearest neighbors of your next test plant.
+
+The displayed “two out of three neighbors agree” is a *vote*, not a reliable probability that a real plant will thrive.
+
+## Explore the Dataset Columns
+
+### Numerical and categorical features
+
+**Water** and **sunlight** are *numerical features*. They represent quantities, so a distance-based method can compare their values directly after choosing appropriate units or scaling.
+
+**Pot material** is a *categorical feature*: Clay, Plastic, or Ceramic. These are category names, not quantities with meaningful arithmetic distances. A model that needs numeric inputs would first require a suitable representation, such as one-hot encoding. This introductory lab displays pot material but **does not use it for training**.
+
+### Missing measurements are not zero
+
+Find the row with an empty water measurement. In the original dataset, it has **missing data**, not a measurement of zero liters. The lab excludes it from training whenever water is selected as a feature. If you train using only sunlight, the same row becomes usable again.
+
+That is one possible educational strategy, not a universally preferred one. Real projects may impute a missing value, discard a record, use algorithms that support missing values, or collect a better measurement. Choosing correctly depends on the reason values are missing and the problem being solved.
+
+### Why feature quality matters
+
+More columns do not automatically make a model better. Incorrect values, unrepresentative examples, irrelevant features, and missing information can all hurt predictions. Géron emphasizes that data quality and feature engineering are major parts of a successful ML project.
+
+Feature selection means choosing which existing attributes are useful. Feature engineering can also create new attributes—for example, a ratio computed from two available measurements. We will examine preprocessing and feature scaling more thoroughly in **Lesson 07**.
+
+### From one row to mathematical notation
+
+In supervised learning, each training example has an input vector, typically called **x**, and an output or target **y**. If we use only water and sunlight, one sample might look like this:
+
+- **Input x** = (2.4 liters of water, 5.1 hours of sunlight)
+- **Target y** = Thriving
+
+Gathering all the input vectors produces a feature table often denoted **X**. The known targets form a corresponding target collection **y**. Each row of **X** must match the correct target in **y**.
+
+This notation is introduced in Géron's Chapter 2 when he defines a dataset's feature matrix and prediction targets.
+
+## Guided Practice
+
+Use the lab to answer these questions by changing the data yourself:
+
+1. There are 12 starting samples, but only 11 can be plotted. Which measurement is missing, and why is that plant not plotted?
+2. Train with water and sunlight. Move the test point to a location far away from all examples. Does the classifier still produce a prediction? Should you trust it equally?
+3. Clear one other water cell. How many training examples remain usable? Now deselect water and retrain; why does the number change?
+4. Flip the label of one nearby point and retrain. Which part of the dataset changed: a feature, the target, or the total number of samples?
+5. Imagine someone added **Plant health** itself to the input feature list. Why would that be **target leakage**?
+
+**Think beyond the demo:** An observation could also be an email, a customer transaction, a photograph, or a sound clip. Its features might be words, pixels, transaction amounts, or audio measurements. A *sample* is not always one row of human-readable numbers, but the idea of “one example with attributes” still applies.
+
+## Knowledge Check
+
+Identify rows, numerical and categorical columns, target leakage, and missing data before moving forward.
+
+<DataFeaturesQuiz />
+
+## Key Takeaways and References
+
+- A **sample / instance** is one observation.
+- A **feature** is a measurement or attribute supplied to a model.
+- A **label / target** is the desired output in supervised learning.
+- **Numerical** and **categorical** features may need different preprocessing.
+- **Missing data** needs deliberate handling; missing does not automatically mean zero.
+- **Target leakage** happens when information that should not be available for prediction enters the inputs or training procedure.
+- Good feature choices and representative data are as important as the model itself.
+
+**Primary reference:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed. (O'Reilly, 2022; copyright 2023). See **Chapter 1**, *Training Supervision* (pp. 10–11), *Irrelevant Features* (p. 30), and **Chapter 2**, *Look at the Big Picture* (pp. 41–45), *Take a Quick Look at the Data Structure* (pp. 51–55), and *Prepare the Data for Machine Learning Algorithms* (pp. 67–83).
+
+For runnable Python examples, see <Link href="https://github.com/ageron/handson-ml3">Géron's official Hands-On ML 3 notebooks</Link>. All lesson text, exercises, the synthetic dataset, and the JavaScript experiment were independently created for Jav's Lab; no book figures or passages are reproduced.
+
+**Previous:** <Link href="/learn/ml/types-of-machine-learning">02 — Types of Machine Learning</Link>  
+**Course overview:** <Link href="/subjects/ml">All Machine Learning modules ↗</Link>  
+**Coming next:** 04 — How Machine Learning Models Learn
+
+</LessonWorkbench>

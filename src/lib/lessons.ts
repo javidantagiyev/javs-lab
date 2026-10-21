@@ -31,6 +31,14 @@ export const lessons: Lesson[] = [
   },
   {
     subject: "ml",
+    topic: "data-features-and-labels",
+    title: "Data, Features, and Labels",
+    description: "Explore samples, input features, target labels, and data quality in an editable dataset.",
+    difficulty: "Beginner",
+    content: () => import("@/content/ml/data-features-and-labels.mdx"),
+  },
+  {
+    subject: "ml",
     topic: "gradient-descent",
     title: "Gradient Descent",
     description: "Learn optimization through interactive experiments.",
