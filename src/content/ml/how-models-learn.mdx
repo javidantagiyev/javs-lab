@@ -1,0 +1,153 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import ModelLearningLab from "@/components/labs/ModelLearningLab";
+import ModelLearningQuiz from "@/components/learning/ModelLearningQuiz";
+
+## From Examples to a Model
+
+In <Link href="/learn/ml/data-features-and-labels">Lesson 03</Link>, we learned to identify **samples**, **input features**, and **target labels**. But what happens *after* we collect a dataset? How does the computer turn those rows into something that can make predictions?
+
+Think about a learner preparing for a practice test. We record the number of hours spent studying and the resulting score. Looking at several observations, we notice a trend: students who spent more time studying often have higher practice scores. A machine learning algorithm can use these examples to fit a prediction rule.
+
+This is **model-based learning**: instead of memorizing individual examples, the system chooses a model family and **learns suitable parameters** from the data. Géron introduces this distinction in Chapter 1, *Instance-Based Versus Model-Based Learning* (pp. 21–26).
+
+Our goal is not to claim that study time alone determines performance. This lesson's tiny dataset is **fictional**, and the relationship is an illustrative correlation—not evidence of causation or a reliable score predictor.
+
+## The Four Parts of Learning
+
+A simple model-training loop has four ingredients:
+
+1. **Examples:** Each training record gives a number of study hours (input) and a practice score (target).
+2. **Model:** A mathematical rule turns the input into a prediction.
+3. **Loss:** A function tells us how far the predictions are from the known targets.
+4. **Training algorithm:** A procedure changes the model's parameters to reduce its loss.
+
+The training loop repeats: **predict → measure error → update parameters → predict again**. We often call one pass through this process a *training step*. A step is not necessarily a full pass over the dataset—our particular experiment uses the entire tiny training set for each update.
+
+### What is a parameter?
+
+For an introductory example, let's use a straight-line model:
+
+$$
+\hat{y} = b + mx
+$$
+
+Here **x** is the number of hours spent studying, **ŷ** ("y-hat") is the predicted practice score, **b** is the *intercept*, and **m** is the *slope*. Both **b** and **m** are **model parameters**—numbers that training can adjust.
+
+The *intercept* is the predicted score when the input is zero. The *slope* is the change in predicted score for one additional hour. For example, a line with intercept 12 and slope 8 would predict a score of 52 for five hours.
+
+Changing a parameter changes the **whole prediction rule**, not just the prediction for one sample. Training tries to find parameter values that work reasonably well across the available examples.
+
+### How does the model know it is wrong?
+
+For one example, we can subtract the true score from the prediction. But we need one number describing the model's total error across the training set. One common choice is **mean squared error (MSE)**:
+
+$$
+\mathrm{MSE} = \frac{1}{n} \sum_{i=1}^{n} \left(\hat{y}_i - y_i\right)^2
+$$
+
+We square each prediction error, then average the squares. Larger mistakes count more strongly. In the experiment, we'll also display **root mean squared error (RMSE)**, which is easier to interpret because it is measured in *score points* rather than squared points.
+
+<LessonWorkbench lab={<ModelLearningLab />} name="How Models Learn — Train a Prediction Line">
+
+## Interactive Experiment — Train the Line
+
+The right panel shows a **real training loop implemented in JavaScript**, not a pre-recorded animation. There are eight gold training observations, a gold prediction line, and three teal-outlined **unseen examples** that the training algorithm never uses.
+
+The model begins with deliberately poor parameter values. Its line does not match the upward trend. Your job is to improve it—first by hand, then by allowing an optimization algorithm to take over.
+
+### Mission 01 — Be the learning algorithm
+
+Use the **Intercept** and **Slope** sliders on the right. See what each one does to the line:
+
+- **Intercept** shifts the line up or down.
+- **Slope** changes its tilt.
+- The dotted gold segments show the distance between training targets and predictions.
+
+Try making the dotted error lines as short as possible. Watch the **Training error (RMSE)** number. Can you reduce it without pressing a training button?
+
+### Mission 02 — Let the computer learn
+
+Press **Reset**, then **One step**. The model changes both parameters, using the available training examples. Press it several more times. The error should generally decrease for the default learning rate.
+
+Then click **Train 50**. Watch the prediction line rotate and shift until it follows the training points much more closely. The loss-history trace below the graph shows how training MSE changed over successive steps.
+
+This experiment uses **batch gradient descent** on a linear model, as discussed in Géron's Chapter 4. To keep the numerical updates stable and understandable, both study hours and practice scores are normalized *inside the optimization calculation*. The equation and parameters shown to you remain in ordinary hours and score points.
+
+### Mission 03 — Change the learning rate
+
+The **learning rate** controls the size of each parameter update. Press **Reset**, then try different learning rates. With very small updates, progress can be slow. With excessively large updates, training can oscillate or even diverge.
+
+The learning rate is a **hyperparameter**, not a model parameter. It is something *you choose* to control how training proceeds. Gradient descent updates the intercept and slope; it does not automatically adjust the learning rate in this lab.
+
+### Mission 04 — Try a new input
+
+Click the chart or use the **Study hours** control to choose a new input. The highlighted dot on the fitted line shows the model's current prediction.
+
+Turn **Show unseen examples** on or off. Those three examples were not used during training. Their error is reported separately. A lower training error is useful, but it alone cannot prove that a model will behave well on data it has never seen.
+
+We'll explore the proper roles of **training**, **validation**, and **test** datasets in <Link href="/subjects/ml">Lesson 05</Link>.
+
+## Understanding the Training Update
+
+A model's predictions depend on its parameters. Training looks for changes that reduce a cost function. In gradient descent, a parameter is moved in the direction *opposite* the gradient of that cost:
+
+$$
+\theta_{\mathrm{new}} = \theta_{\mathrm{old}} - \alpha \frac{\partial J}{\partial \theta}
+$$
+
+Here **θ** represents a parameter, **J** represents the loss, and **α** is the learning rate. In this line-fitting experiment, both the intercept and slope receive updates. The gradient tells us how a small parameter change would affect the loss near the current model.
+
+You don't need to compute these derivatives by hand yet. For now, focus on the **feedback loop**: the model makes errors; the training algorithm uses those errors to improve the parameters. We'll derive and visualize gradient descent in detail in <Link href="/learn/ml/gradient-descent">Lesson 10 — Gradient Descent</Link>.
+
+### Model parameters versus hyperparameters
+
+| Term | In the experiment | Who changes it? |
+| --- | --- | --- |
+| **Feature** | Study hours | Comes from each input example |
+| **Target** | Practice score | Comes from the recorded training data |
+| **Model parameter** | Intercept, slope | You manually, or the training algorithm |
+| **Hyperparameter** | Learning rate | You choose before running updates |
+| **Loss** | Mean squared error | Computed from predictions and known targets |
+
+## Generalization Is the Real Goal
+
+A model can fit the training points very well without becoming universally reliable. Real datasets may contain noise, unrepresentative cases, or relationships that a straight line cannot capture. And the training process sees only a limited slice of the world.
+
+This is why we care about **generalization**: making reasonable predictions for *new cases*, not merely producing small errors on examples already used to fit the model. Géron emphasizes this distinction in Chapter 1, particularly *Main Challenges of Machine Learning* (pp. 27–34).
+
+In our lab, the teal points make that distinction visible. A good fit to the eight gold points is encouraging, but it is not the same as reliable performance everywhere.
+
+## Guided Practice
+
+Without looking at the answers, use the lab to investigate:
+
+1. Start at the default settings. What do the intercept and slope represent? How do you recognize that the model is initially a poor fit?
+2. Change **only the slope**. Which predictions move the most: those near zero hours or those near ten hours? Why?
+3. Click **One step** ten times at the default learning rate. Did the error get smaller? Which model parameters changed?
+4. After pressing **Train 50**, compare the training RMSE with the unseen RMSE. Are they guaranteed to be identical?
+5. Reset and try a very large learning rate. Does every training step necessarily make the model better?
+
+**A note on limitations:** The lab fits just one straight-line model to a tiny, invented dataset. Real model families can have thousands or billions of parameters; some can model nonlinear patterns. Still, the core ideas—examples, predictions, loss, and parameter updates—carry across much of supervised machine learning.
+
+## Knowledge Check
+
+<ModelLearningQuiz />
+
+## Summary and References
+
+- **Training** adjusts model parameters using examples, a chosen loss, and a learning algorithm.
+- **Predictions** come from applying the learned model to input features.
+- **Model parameters** are learned; **hyperparameters** guide how learning happens.
+- **Smaller training loss** is not a guarantee of generalization.
+- **Gradient descent** is one way—not the only way—to optimize model parameters.
+
+**Primary reference:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed. (O'Reilly, 2022/2023). **Chapter 1**, *Instance-Based Versus Model-Based Learning* (pp. 21–26), *Main Challenges of Machine Learning* (pp. 27–34); **Chapter 4**, *Linear Regression* (pp. 132–137) and *Gradient Descent* (pp. 138–148).
+
+**Further reading:** <Link href="https://github.com/ageron/handson-ml3">Géron's official Hands-On ML 3 notebooks ↗</Link>. This lesson's explanations, fictional data, browser experiment, and knowledge check were created for Jav's Lab; no textbook figures or text are reproduced.
+
+**Previous:** <Link href="/learn/ml/data-features-and-labels">03 — Data, Features, and Labels</Link>  
+**Course:** <Link href="/subjects/ml">Machine Learning modules ↗</Link>  
+**Next:** 05 — Training, Validation, and Testing *(planned)*
+
+</LessonWorkbench>

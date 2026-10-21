@@ -45,6 +45,12 @@ export const subjects: Subject[] = [
         status: "available",
       },
       {
+        title: "How Machine Learning Models Learn",
+        description: "Watch a line learn from training examples and compare unseen predictions.",
+        href: "/learn/ml/how-models-learn",
+        status: "available",
+      },
+      {
         title: "Gradient Descent",
         description: "See how optimization moves toward lower loss — one step at a time.",
         href: "/learn/ml/gradient-descent",

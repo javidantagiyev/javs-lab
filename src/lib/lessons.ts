@@ -39,6 +39,14 @@ export const lessons: Lesson[] = [
   },
   {
     subject: "ml",
+    topic: "how-models-learn",
+    title: "How Machine Learning Models Learn",
+    description: "Train a prediction model, adjust its parameters, and see how feedback reduces error.",
+    difficulty: "Beginner",
+    content: () => import("@/content/ml/how-models-learn.mdx"),
+  },
+  {
+    subject: "ml",
     topic: "gradient-descent",
     title: "Gradient Descent",
     description: "Learn optimization through interactive experiments.",

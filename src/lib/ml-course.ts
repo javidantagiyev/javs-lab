@@ -20,7 +20,7 @@ export const mlCourse: CourseModule[] = [
       { number: 1, title: "Introduction to Machine Learning", description: "Why machines learn from examples; train a spam detector.", href: "/learn/ml/introduction-to-machine-learning" },
       { number: 2, title: "Types of Machine Learning", description: "Discover labels, clusters, self-supervision, and rewards.", href: "/learn/ml/types-of-machine-learning" },
       { number: 3, title: "Data, Features & Labels", description: "Understand the building blocks of a dataset." , href: "/learn/ml/data-features-and-labels" },
-      { number: 4, title: "How Models Learn", description: "From data to a useful predictive model." },
+      { number: 4, title: "How Models Learn", description: "From data to a useful predictive model.", href: "/learn/ml/how-models-learn"  },
       { number: 5, title: "Training, Validation & Testing", description: "Evaluate models without fooling yourself." },
       { number: 6, title: "Underfitting & Overfitting", description: "Find the balance between memorizing and generalizing." },
       { number: 7, title: "Data Preprocessing", description: "Prepare reliable features for learning." },
