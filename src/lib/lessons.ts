@@ -19,7 +19,6 @@ export const lessons: Lesson[] = [
     title: "Gradient Descent",
     description: "Learn optimization through interactive experiments.",
     difficulty: "Beginner",
-    // @ts-expect-error MDX module types are provided by the app's bundler.
     content: () => import("@/content/ml/gradient-descent.mdx"),
   },
 ];
