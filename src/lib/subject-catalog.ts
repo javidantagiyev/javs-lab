@@ -51,6 +51,24 @@ export const subjects: Subject[] = [
         status: "available",
       },
       {
+        title: "Training, Validation, and Testing",
+        description: "Compare models on validation data, avoid leakage, and unlock the final holdout.",
+        href: "/learn/ml/training-validation-and-testing",
+        status: "available",
+      },
+      {
+        title: "Underfitting and Overfitting",
+        description: "Experiment with model complexity, noise, and generalization.",
+        href: "/learn/ml/underfitting-and-overfitting",
+        status: "available",
+      },
+      {
+        title: "Data Preprocessing",
+        description: "Prepare model-ready features using safe, repeatable transformations.",
+        href: "/learn/ml/data-preprocessing",
+        status: "available",
+      },
+      {
         title: "Gradient Descent",
         description: "See how optimization moves toward lower loss — one step at a time.",
         href: "/learn/ml/gradient-descent",

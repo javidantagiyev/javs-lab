@@ -1,0 +1,220 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import PreprocessingLab from "@/components/labs/PreprocessingLab";
+import PreprocessingQuiz from "@/components/learning/PreprocessingQuiz";
+
+## From Raw Records to Reliable Inputs
+
+In <Link href="/learn/ml/data-features-and-labels">Lesson 03</Link>, we explored how a dataset is divided into **samples**, **features**, and **targets**. In <Link href="/learn/ml/training-validation-and-testing">Lesson 05</Link>, we learned to evaluate models on held-out data. Now we connect the two: **how do we turn messy, mixed-format features into data a model can actually use?**
+
+Imagine a table of apartments. The floor area is measured in square meters, the building age is sometimes missing, the neighborhood is written as text, and the price is the value we want to predict. Passing this raw table directly to a numerical algorithm would cause problems.
+
+**Data preprocessing** is the process of preparing input features so that training and later predictions use the same meaningful representation. Typical steps include treating missing values, encoding categorical variables, scaling numerical features, and combining transformations into a repeatable pipeline.
+
+Our primary reference is **Aurélien Géron, *Hands-On Machine Learning*, 3rd edition**, Chapter 2, **“Prepare the Data for Machine Learning Algorithms”** (pp. 67–87), especially “Clean the Data,” “Handling Text and Categorical Attributes,” “Feature Scaling and Transformation,” and “Transformation Pipelines.” This is an original lesson and browser-based implementation inspired by those topics.
+
+## What You'll Learn
+
+By the end of this lesson, you should be able to:
+
+1. Recognize missing observations and choose a reasonable treatment.
+2. Explain why a model needs numerical representations of categories.
+3. Compare min–max scaling with standardization.
+4. Distinguish **fit** from **transform**, especially on validation data.
+5. Explain why a preprocessing pipeline should not learn from held-out records.
+
+## 1. Missing Values: We Don't Always Know Everything
+
+Some houses may have an unknown building age. You have several options:
+
+| Strategy | What happens | Trade-off |
+| --- | --- | --- |
+| Remove rows | Discard records with missing required values | Loses training examples; can introduce bias |
+| Mean imputation | Fill missing ages with the mean of *observed training ages* | Sensitive to extreme values |
+| Median imputation | Fill missing ages with the middle observed training age | Often more robust to outliers |
+
+An imputed age is an **estimate**, not a newly discovered fact. In some datasets, a missingness-indicator feature can also help a model learn that a value was missing. More advanced algorithms may handle missing values directly; no single cleaning strategy is always optimal.
+
+For observed training ages $a_1,\ldots,a_n$, mean imputation computes:
+
+$$
+\bar a = \frac{1}{n}\sum_{i=1}^{n}a_i
+$$
+
+Only non-missing observations contribute to this statistic. Notice that **the validation ages must not be used to compute the training imputer**.
+
+## 2. Categorical Features: Neighborhood Is Not a Number
+
+A text field such as `Center`, `Suburb`, or `Coast` is a **categorical feature**. You might be tempted to assign codes 0, 1, and 2, but ordinary numeric distance calculations would then treat those codes as ordered, equally spaced quantities. That usually does not make sense for unrelated neighborhoods.
+
+**One-hot encoding** uses a separate indicator for each category learned from the training set:
+
+| Neighborhood | Center | Coast | Suburb |
+| --- | ---: | ---: | ---: |
+| Center | 1 | 0 | 0 |
+| Coast | 0 | 1 | 0 |
+| Suburb | 0 | 0 | 1 |
+
+The validation set may contain a category never seen during training. Our demo uses the equivalent of an **ignore-unknown** policy: an unfamiliar neighborhood has zeros in all learned neighborhood columns. This preserves the number and order of input features. It does **not** mean the category is equivalent to a known neighborhood, or that predictions for that category will be reliable.
+
+## 3. Feature Scaling: Units Can Change Geometry
+
+Suppose the model uses two numerical features:
+
+- Area: values around **40–150 m²**.
+- Age: values around **0–40 years**.
+
+In algorithms based on Euclidean distances, the feature with the larger numeric range may disproportionately influence which observations are considered similar. Scaling can give the features more comparable influence.
+
+**Min–max scaling** uses the *training* minimum and maximum:
+
+$$
+ x_{\mathrm{scaled}}=\frac{x-x_{\min,\mathrm{train}}}{x_{\max,\mathrm{train}}-x_{\min,\mathrm{train}}}
+$$
+
+This maps training values into the range 0–1, provided the maximum exceeds the minimum. A validation value outside the training range can legitimately become **less than 0 or greater than 1**. That is not a bug.
+
+**Standardization** (z-score scaling) uses the *training* mean and standard deviation:
+
+$$
+ z=\frac{x-\mu_{\mathrm{train}}}{\sigma_{\mathrm{train}}}
+$$
+
+It centers the training feature near zero with roughly unit standard deviation. Standardized values are **not limited to 0–1**. Our lab uses population standard deviation for the finite training sample and safely handles a constant feature.
+
+Neither scaling method is universally best. Tree-based models, for example, are commonly much less sensitive to monotonic rescaling than nearest-neighbor or gradient-based methods.
+
+## 4. The Fit–Transform Boundary
+
+A key distinction is whether a preprocessing step *learns something from the data*.
+
+**Fit** learns statistics or a vocabulary, such as the age median, area mean, or known neighborhood categories. **Transform** applies those learned choices to new rows without changing them.
+
+The safe pattern is:
+
+```text
+TRAINING FEATURES → fit preprocessing → transform training features → train model
+VALIDATION FEATURES → reuse fitted preprocessing → transform validation → evaluate
+NEW INPUTS → reuse the same fitted preprocessing → model predicts
+```
+
+Do **not** compute the imputer median, category vocabulary, or scaler statistics from training and validation together. Even without looking at the validation targets, information about the held-out feature distribution would influence training. This is a form of **data leakage**.
+
+There is a second separation to protect: the **target price is not an input feature**. The model learns from input features paired with target labels during training; it does not get to read the true price when predicting a new example.
+
+<LessonWorkbench lab={<PreprocessingLab />} name="Data Preprocessing — From Raw Data to Model-Ready Features">
+
+## Interactive Experiment — The Data Preparation Studio
+
+The right panel holds an original **synthetic housing dataset**. It has 10 labeled training examples and 4 labeled validation examples. Each row contains area, age, neighborhood, and price. Price is shown for teaching and evaluation, but is not passed into the preprocessing feature vectors.
+
+The lab follows this sequence:
+
+1. Select a missing-age strategy.
+2. Choose a numerical scaling method.
+3. Turn neighborhood encoding on or off.
+4. Press **Fit pipeline & evaluate**.
+5. Inspect the **Prepared** table and the fitted statistics.
+
+The lab fits an **illustrative 3-nearest-neighbors regressor** on the transformed training rows and reports **validation mean absolute error** (MAE) in thousands of AZN. A neighbor's distance uses the prepared features, and the model predicts by averaging the target prices of its three closest training examples.
+
+$$
+ \mathrm{MAE}=\frac{1}{m}\sum_{i=1}^{m}|y_i-\hat y_i|
+$$
+
+This small fictional dataset is for intuition, not a reliable property valuation system. Four validation observations are far too few to infer real-world accuracy.
+
+### Mission 01 — Repair missing ages
+
+Find rows **T03** and **T07**, which have no age. Choose **Impute median** and run the pipeline. Check the **AGE FILL VALUE** and the new values in the **Prepared** table.
+
+Switch to **Impute mean** and rerun. Are the replacement ages the same? Try **Drop missing rows** and inspect how many training and validation records disappear. You can click a training row and edit its age; leave the age field blank to create missingness.
+
+**Think:** Why could discarding rows produce a biased sample if missing values are related to the type of property?
+
+### Mission 02 — Give neighborhoods a usable representation
+
+Keep **One-hot encode neighborhood** checked. Run the pipeline and examine the new `zone_center`, `zone_coast`, and `zone_suburb` columns.
+
+Validation row **V02** belongs to `Hills`, which is not represented in the original training set. Inspect the lab's warning and its prepared row. Then edit a training row's zone to `Hills` and refit. Notice that the learned set of one-hot columns may change—but only when you intentionally fit a **new** pipeline to changed training data.
+
+**Think:** Why would assigning `Center = 0`, `Suburb = 1`, and `Coast = 2` be a poor default for distance-based algorithms?
+
+### Mission 03 — Let the feature units compete
+
+Run the pipeline with **No scaling**, then with **Min–max**, and finally with **Standardize**. Observe the prepared feature values and how the 3-NN validation MAE changes.
+
+The MAE need not improve every time: scaling modifies the geometry, but one small validation set cannot establish a universal winner.
+
+**Think:** Why might an unscaled floor-area feature dominate an age feature when we use Euclidean distances?
+
+### Mission 04 — Create leakage deliberately
+
+Start from the original data using **Restore original data**. Fit the standard pipeline, and record the area mean and learned neighborhood categories under **Inspect fitted statistics**.
+
+Now enable **Leakage demo: fit transformer on train + validation** and rerun. Our validation set includes houses with areas outside much of the training range and an unfamiliar neighborhood. See how the fitted statistics and one-hot vocabulary change.
+
+Importantly, this switch **never adds validation examples to the 3-NN training set** and never uses validation target prices to compute preprocessing statistics. It illustrates **preprocessing leakage alone**. Real projects should leave this switch off.
+
+### Mission 05 — Reproduce a prediction
+
+Inspect the validation prediction table. Choose a validation record and read its actual price, 3-NN prediction, and absolute error. Then change a training example's age or zone and refit.
+
+**Think:** A price prediction changes because you altered the training features. Does that mean the true price changed? No. This is a reminder that **features, labels, and predictions are different things**.
+
+## 5. Pipelines Make Preprocessing Repeatable
+
+When a project has several features, repeated manual steps are easy to apply incorrectly. Géron shows how to create **pipelines** in Scikit-Learn, including separate numerical and categorical branches.
+
+This compact example demonstrates the same idea in Python. It is **illustrative code**, not a dependency of the browser lab:
+
+```python
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+numeric = make_pipeline(
+    SimpleImputer(strategy="median"),
+    StandardScaler(),
+)
+
+preprocess = ColumnTransformer([
+    ("numeric", numeric, ["area", "age"]),
+    ("neighborhood", OneHotEncoder(handle_unknown="ignore"), ["zone"]),
+])
+
+# The target column, price, is separate from X.
+X_train_ready = preprocess.fit_transform(X_train)
+X_valid_ready = preprocess.transform(X_valid)  # no fit on validation
+```
+
+A production pipeline also needs careful treatment of dataset versioning, unexpected column types, outliers, and drift. A fitted transformer should be deployed together with the model that expects its feature representation.
+
+## Knowledge Check
+
+<PreprocessingQuiz />
+
+## Key Takeaways
+
+- **Imputation** estimates missing values or deliberately excludes unusable examples.
+- **One-hot encoding** represents categories without imposing a fictional numeric order.
+- **Scaling** changes feature magnitudes and often matters for distance-based learning.
+- **Fit on training data, transform held-out data** keeps evaluation meaningful.
+- **Pipelines** make transformations reproducible and keep training/inference consistent.
+
+## Module 01 Complete
+
+You've now built a conceptual foundation for machine learning: what ML is, learning types, data representation, the learning process, evaluation, generalization, and preprocessing.
+
+In **Module 02 — Regression & Optimization**, we'll turn these ideas into practical predictive models, beginning with **Linear Regression**.
+
+### Academic References
+
+**Primary:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed., O'Reilly Media, 2022/2023. Chapter 2, “Prepare the Data for Machine Learning Algorithms,” pp. **67–87**: “Clean the Data” (pp. 68–71), “Handling Text and Categorical Attributes” (pp. 71–75), “Feature Scaling and Transformation” (pp. 75–83), and “Transformation Pipelines” (pp. 83–87). Also Chapter 2, “Create a Test Set” (p. 55 onward).
+
+**Source notebooks:** <a href="https://github.com/ageron/handson-ml3" target="_blank" rel="noopener noreferrer">Géron's official open-source Jupyter notebooks</a>.
+
+This lesson contains original explanations, a synthetic dataset, and an original learning experiment. It does not reproduce copyrighted book illustrations or chapter text.
+
+</LessonWorkbench>

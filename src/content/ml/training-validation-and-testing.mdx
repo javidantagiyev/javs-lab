@@ -1,0 +1,144 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import SplitEvaluationLab from "@/components/labs/SplitEvaluationLab";
+import SplitEvaluationQuiz from "@/components/learning/SplitEvaluationQuiz";
+
+## A Model That Looks Great — Until It Meets Reality
+
+In <Link href="/learn/ml/how-models-learn">Lesson 04</Link>, we trained a prediction model and watched its error get smaller. But how do we know whether the model **learned a useful pattern**, rather than merely adapting to the examples it was given?
+
+Imagine studying for an exam by memorizing the answers to one practice sheet. You might get every question on that sheet right—but that says surprisingly little about your performance on a new exam.
+
+Machine learning has the same problem. A model evaluated on the very data it learned from can appear better than it truly is. To test whether learning **generalizes**, we reserve examples the model has not seen while fitting its parameters.
+
+Géron introduces *testing and validating* in Chapter 1 (pp. 34–36), then develops practical dataset splitting and model evaluation in Chapter 2. In this lesson, we'll turn those ideas into a hands-on experiment.
+
+## The Three Roles of Data
+
+For a standard supervised-learning workflow, each example has **features** (inputs) and a known **target** (the correct answer). We divide the available examples into non-overlapping groups with different responsibilities:
+
+| Set | Purpose | Can it influence the final model? |
+| --- | --- | --- |
+| **Training** | Fit the model's parameters—such as regression coefficients | **Yes.** This is what it learns from. |
+| **Validation** | Compare candidate models and choose hyperparameters | **Indirectly.** Our choices depend on its results. |
+| **Test** | Estimate performance of the already-chosen model on unseen cases | **No.** Keep it untouched until the end. |
+
+The percentages are flexible. A **60 / 20 / 20** split means 60% of examples are used for training, 20% for validation, and 20% for testing. You can try other ratios in the lab. There is no universally optimal split: dataset size and problem structure matter.
+
+### Why isn't training error enough?
+
+A sufficiently flexible model might memorize noise in the training data. Its training error could be tiny while its predictions on new examples are poor. Validation data gives us a more independent signal while we compare models.
+
+However, after we repeatedly make decisions using validation results, those decisions themselves become tuned to that validation set. **That is why the final test set must remain separate.**
+
+<LessonWorkbench lab={<SplitEvaluationLab />} name="Training, Validation, and Testing — Split and Evaluate">
+
+## Interactive Experiment — Split. Select. Test.
+
+The right panel contains **60 invented observations**. Each observation pairs a numerical input with a noisy target value. There is a nonlinear pattern underneath the noise, but you don't know its exact shape.
+
+The lab fits polynomial regression models of five different degrees. Its fitted curves and RMSE values are computed **in your browser** from the data—not generated animations or fixed answers.
+
+### Mission 01 — Split the data
+
+Start with **60 / 20 / 20**. Observe the counts:
+
+- **Training:** 36 examples. These fit the model's coefficients.
+- **Validation:** 12 examples. These help you select the polynomial degree.
+- **Test:** 12 examples. These remain concealed until you finish selecting.
+
+Try **70 / 15 / 15** and **40 / 30 / 30**. How many examples are now available to train the model? How many remain to evaluate it?
+
+Press **Reshuffle split**. The total dataset stays the same, but different observations become training, validation, and test examples. Notice that evaluation outcomes can depend on which examples end up in each partition.
+
+### Mission 02 — Train several candidates
+
+Click **Train 5 candidates**. For each polynomial degree, the lab fits coefficients using the training examples. You will see two scores:
+
+**Training RMSE** measures prediction error on the examples used to fit the model. **Validation RMSE** measures error on examples the fitting algorithm did not use.
+
+The root mean squared error is:
+
+$$
+\mathrm{RMSE}=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i-y_i)^2}
+$$
+
+Here, **ŷ** is a prediction, **y** is the actual target, and **n** is the number of evaluated examples. Lower RMSE generally means a better fit *on that dataset*, and the unit matches the target's unit.
+
+Select different **degrees** in the candidate table. The pale gold curve changes. A degree-1 model is a straight line; higher degrees allow more complex shapes. Don't assume that the lowest **training** RMSE is the best choice.
+
+### Mission 03 — Choose using validation
+
+Look for the candidate with the **lowest validation RMSE**. You can pick it manually or press **Choose lowest validation error**. That is a simple form of **model selection**.
+
+Before selecting, ask yourself:
+
+1. Which degree has the smallest training error?
+2. Which degree has the smallest validation error?
+3. Are these necessarily the same degree?
+
+Polynomial degree is a **hyperparameter**: it controls the model family you choose before fitting its coefficients. The fitted coefficients are **model parameters** learned from training data.
+
+### Mission 04 — See what leakage does
+
+Enable **Demonstrate data leakage**, then retrain the candidates. In this intentionally incorrect mode, the algorithm uses the validation examples **during training** and still reports a "validation" error.
+
+That score is now contaminated: the examples are no longer independent of fitting. A low error may look convincing, but we have broken the evaluation procedure. Turn leakage **off** and retrain before evaluating on the final test set.
+
+This is just one form of leakage. Real projects also suffer from near-duplicate records across splits, preprocessing learned from all data, or future information accidentally appearing in today's features.
+
+### Mission 05 — Open the sealed test
+
+Choose your final model using legitimate validation results. Then press **Unlock final test**.
+
+The lab reveals the purple test examples and computes the selected model's **test RMSE**. The degree selection is locked for that run, because changing your model *after* seeing its test score would turn the test set into another validation set.
+
+Compare validation RMSE with test RMSE. They won't necessarily match: both are estimates based on finite samples. A single small synthetic experiment does not guarantee how a real-world model will perform.
+
+## A Critical Distinction: Selecting vs. Evaluating
+
+**Parameter fitting** uses training data. **Hyperparameter selection** compares choices using validation data. **Final evaluation** estimates generalization with untouched test data.
+
+These stages should be treated as different activities, even if the same program performs all three.
+
+A subtle but important detail: **you can overfit the validation set too**. Suppose you try hundreds of model variants, choosing the one that happens to score best on a particular validation sample. Even without using validation examples to fit coefficients, your repeated choices can exploit random quirks in that sample. The final test helps detect overoptimistic selection.
+
+### What about cross-validation?
+
+With limited data, a single validation split can be noisy. **Cross-validation** repeats training and evaluation using different held-out folds, giving a more stable basis for model selection. Géron discusses this in Chapter 2 (pp. 88–97). We'll cover it more fully when we reach *Model Selection and Hyperparameter Tuning* in Module 4.
+
+For now, the three-way holdout is the simplest way to learn the separation of roles.
+
+## Guided Practice
+
+Use the experiment to investigate these questions before taking the quiz:
+
+1. With 60 / 20 / 20, how many observations go into each group? Why are there no purple test points initially?
+2. For the medium-noise dataset, is the lowest training RMSE always associated with the lowest validation RMSE?
+3. Increase **Noise level**. What changes in the training and validation RMSE values?
+4. Enable validation leakage and retrain. Why is the displayed validation error no longer trustworthy as an independent score?
+5. Finalize a model. Why should you *not* change the degree repeatedly in response to test scores?
+
+**Experiment limitations:** The data is fictional, observations are independent by construction, and the models use straightforward polynomial least-squares regression. For real data involving people, patients, groups, locations, or time series, a random row split may be inappropriate. Group-aware or chronological splits may be necessary to prevent leakage. The lab is a teaching model, not a production evaluation pipeline.
+
+## Knowledge Check
+
+<SplitEvaluationQuiz />
+
+## Key Takeaways
+
+- The **training set** fits model parameters.
+- The **validation set** helps choose model designs and hyperparameters.
+- The **test set** estimates how the final, chosen model generalizes.
+- **Data leakage** invalidates an evaluation by allowing information from a holdout set to influence training inappropriately.
+- **Small error on training data** does not guarantee accurate predictions on unseen examples.
+
+### Academic References
+
+**Primary:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed. O'Reilly, 2022/2023. Chapter 1, **"Testing and Validating"**, pp. 34–36; Chapter 2, **"Create a Test Set"**, pp. 55–60, **"Better Evaluation Using Cross-Validation"**, pp. 88–90, and **"Fine-Tune Your Model"**, pp. 91–97.
+
+This lesson's explanations, synthetic observations, model-fitting code, and graphics are original Jav's Lab material developed with the book as an academic reference.
+
+Continue with **Lesson 06 — Underfitting and Overfitting** when it becomes available in Module 1.
+
+</LessonWorkbench>

@@ -1,0 +1,146 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import GeneralizationLab from "@/components/labs/GeneralizationLab";
+import GeneralizationQuiz from "@/components/learning/GeneralizationQuiz";
+
+## When Lower Error Is Not Better
+
+In <Link href="/learn/ml/training-validation-and-testing">Lesson 05</Link>, we separated training, validation, and testing so that evaluation would tell us something about **new examples**. Now we'll explore one of the most important reasons a model might fail on those examples: it may be **too simple**, or it may have become **too attached to its training data**.
+
+Suppose you're drawing a curve through measurements of a changing physical process. A straight line might miss an obvious bend. An extremely flexible curve might pass through nearly every observation—including the accidental noise. Neither extreme is necessarily a good predictor of what happens next.
+
+Aurélien Géron introduces **overfitting and underfitting** in *Hands-On Machine Learning*, 3rd edition, Chapter 1, pp. 30–34, and returns to polynomial regression and learning curves in Chapter 4, pp. 149–155. Our experiment makes that trade-off visible.
+
+## Two Different Failure Modes
+
+**Underfitting** happens when a model cannot capture important structure in the relationship it is learning. For example, a linear model is often too restrictive for curved data. It may perform poorly even on training examples. This is often associated with **high bias**.
+
+**Overfitting** happens when a model adapts too closely to patterns that are specific to the training sample, including noise. It can have extremely low training error but substantially worse error on unseen data. This is often associated with **high variance**.
+
+| Symptom | Underfitting | Overfitting |
+| --- | --- | --- |
+| Typical model | Too simple for the pattern | Too flexible relative to data/noise |
+| Training error | Often high | Often low |
+| Validation error | Often high | Often much higher than training error |
+| Typical remedies | Better features, more capable model, fewer unnecessary constraints | More representative data, simpler model, regularization, less noise |
+
+These are **patterns**, not automatic diagnoses. High validation error can also be caused by distribution shift, bad measurements, or data leakage. Always investigate the data and evaluation procedure.
+
+## What Does Model Complexity Mean?
+
+Consider a polynomial regression model. Its degree controls how flexible the fitted curve can be:
+
+$$
+\hat{y}=\theta_0+\theta_1x+\theta_2x^2+\cdots+\theta_dx^d
+$$
+
+Here, **d** is the polynomial degree. With **d = 1**, the prediction is a straight line. With a larger degree, the model can bend in more complicated ways. The parameters **θ** are learned from training examples; the degree **d** is a *hyperparameter* we choose using validation data.
+
+Our lab uses a numerically stable polynomial basis instead of powers of x directly. The polynomial degrees and the underlying modeling idea are the same.
+
+<LessonWorkbench lab={<GeneralizationLab />} name="Underfitting and Overfitting — Fit the Pattern, Not the Noise">
+
+## Interactive Experiment — Fit the Pattern, Not the Noise
+
+The right panel has an original **synthetic dataset**. A smooth mathematical function generates the underlying signal. Random measurement noise is added to individual observations. You can adjust the number of training examples and the noise level, then fit polynomial regressions of six different degrees.
+
+- **Gold dots** are the training examples used to fit the model.
+- **Teal dots** are the independent validation examples used to compare candidates.
+- **Pale gold curve** is the currently selected fitted model.
+- **Dashed green curve**, if revealed, is the real signal used to generate the synthetic data. With real measurements, we generally would not know that true signal.
+
+### Mission 01 — Make a model underfit
+
+Set **Training examples = 48** and **Noise = Low**. Press **Train six models**, then select **Degree 1**.
+
+Observe that the straight line cannot follow all the bends in the data. Compare its *training RMSE* and *validation RMSE* with higher-degree candidates.
+
+Underfitting is about **missing an important pattern**, not simply about having a lower degree number. For truly linear data, a degree-1 model could be an excellent choice.
+
+### Mission 02 — Make a model overfit
+
+Set **Training examples = 12** and **Noise = High**. Train again. Switch between **Degree 3** and **Degree 11**.
+
+The high-degree curve has enough flexibility to chase sample-specific variations. You may see a much lower training error but a higher validation error. Press **New sample** and repeat: the exact results can vary with the observations.
+
+Define the **generalization gap** in this experiment as:
+
+$$
+\mathrm{Gap}=\mathrm{RMSE}_{\mathrm{validation}}-\mathrm{RMSE}_{\mathrm{train}}
+$$
+
+A large positive gap can be a warning sign that a model is fitting its training sample much better than it predicts unseen observations. The gap alone is not a complete measure of quality: we also care about the absolute validation error.
+
+### Mission 03 — Give the model more data
+
+Keep **Noise = High**, change the training size from **12** to **96**, and train again.
+
+Compare the higher-degree fits. More representative examples often make it harder for a flexible model to follow every random fluctuation. But more data is **not an unconditional cure**; bias, systematic measurement errors, and distribution differences can remain.
+
+### Mission 04 — Find the balance
+
+Try the six polynomial degrees and press **Select lowest validation error**. This chooses the candidate with the smallest validation RMSE in the current run.
+
+Both errors are root mean squared error:
+
+$$
+\mathrm{RMSE}=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(\hat y_i-y_i)^2}
+$$
+
+In this context, **n** is the number of examples in the evaluated group, **ŷ** is the model's prediction, and **y** is the measured target. Lower is better **for the evaluated group**, but only validation results should guide degree selection here.
+
+### Mission 05 — Check genuinely unseen data
+
+Once you select a model using validation, press **Unlock final test**. The experiment reveals the chosen model's test RMSE and locks further degree selection for that run.
+
+Do not keep changing degrees to improve this final test score. That would turn your test set into a second validation set. To explore a new training run, change a dataset setting or generate a new sample.
+
+## Bias, Variance, and Irreducible Noise
+
+**Bias** is the systematic error that can arise from assumptions too restrictive for the real pattern. **Variance** is a model's sensitivity to changes in the training sample. In general, more flexible models can reduce bias, but may increase variance.
+
+Measurement noise adds another difficulty. If two identical inputs can legitimately produce different noisy outputs, no deterministic prediction can recover both exactly. We call this an element of *irreducible error*.
+
+The familiar bias–variance trade-off is a useful way to reason about model complexity, but it's a conceptual guide rather than a rule that the most complicated model always loses.
+
+## Practical Ways to Respond
+
+If your model underfits, try a more expressive model, improve the input features, or relax overly restrictive regularization. If it overfits, try simplifying the model, collecting more representative training examples, improving data quality, or adding regularization. Géron discusses these responses in Chapter 1, pp. 30–33.
+
+One important distinction: **regularization** deliberately limits a model's freedom. We'll study how Ridge and Lasso do that in Module 2. For now, this lab uses only a tiny fixed numerical stabilizer when fitting its polynomials; it does not provide a tunable regularization experiment.
+
+## What the Lab Does—and Doesn't—Prove
+
+The graph uses fictional data generated by a known smooth curve. Every time you train, the lab solves polynomial least-squares models from the current training observations and evaluates them on separate validation observations. The final test set stays outside both fitting and selection.
+
+Because the dataset is synthetic, you can reveal the true curve and directly see deviations caused by noise. Real projects rarely offer this luxury. Model behavior also depends on sample composition; a single run does not prove a general law about the best polynomial degree.
+
+## Guided Practice
+
+1. With **48 samples / Low noise**, which degree has the lowest validation error? Does degree 1 follow the shape of the observations?
+2. With **12 samples / High noise**, compare degrees 3 and 11. Which has the lower training error? Which generalizes better?
+3. Increase the sample size to **96**. Does the gap for degree 11 shrink, grow, or stay similar? Repeat using **New sample**.
+4. Reveal the **underlying signal**. Does a high-degree fitted curve always resemble it, even when the training RMSE is small?
+5. Before opening the final test, select the candidate using **validation RMSE**. Why should test error remain sealed until that decision?
+
+## Knowledge Check
+
+<GeneralizationQuiz />
+
+## Key Takeaways
+
+- **Underfitting:** the model misses important structure because it is too restricted for the task.
+- **Overfitting:** the model fits training-specific noise or quirks and predicts less well on new examples.
+- **Model complexity:** increased flexibility can help or hurt, depending on noise, data, and the true relationship.
+- **Validation error:** compare candidate complexity levels using held-out observations.
+- **Final test error:** evaluate the chosen model only after the selection process is complete.
+
+### Academic References
+
+**Primary:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed., O'Reilly Media (2022/2023). Chapter 1, **"Overfitting the Training Data"** and **"Underfitting the Training Data"**, pp. 30–34; Chapter 4, **"Polynomial Regression"** and **"Learning Curves"**, pp. 149–155.
+
+This lesson is an original Jav's Lab explanation and interactive implementation inspired by the academic concepts in Géron's book. It does not reproduce the book's illustrations or text.
+
+**Next lesson:** Lesson 07 — Data Preprocessing.
+
+</LessonWorkbench>
