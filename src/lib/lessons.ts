@@ -15,6 +15,14 @@ export type Lesson = {
 export const lessons: Lesson[] = [
   {
     subject: "ml",
+    topic: "introduction-to-machine-learning",
+    title: "Introduction to Machine Learning",
+    description: "Understand how machines learn from data, train a spam filter, and test generalization.",
+    difficulty: "Beginner",
+    content: () => import("@/content/ml/introduction-to-machine-learning.mdx"),
+  },
+  {
+    subject: "ml",
     topic: "gradient-descent",
     title: "Gradient Descent",
     description: "Learn optimization through interactive experiments.",

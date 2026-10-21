@@ -1,0 +1,132 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import IntroMLSpamLab from "@/components/labs/IntroMLSpamLab";
+import IntroMLQuiz from "@/components/learning/IntroMLQuiz";
+
+## What Is Machine Learning?
+
+Imagine being asked to write software that recognizes unwanted email. You could manually write hundreds of rules: block messages containing certain phrases, reject suspicious senders, and keep adjusting the rules whenever spammers invent new tricks.
+
+But what if the program could **discover useful patterns from examples** instead?
+
+That is the central idea of **machine learning (ML)**: we build systems that improve at a task by learning patterns from data, rather than specifying every decision as a hand-written rule.
+
+Machine learning is not the same as simply storing a large amount of information. A useful model should be able to **generalize**: apply what it learned to new examples it has never seen.
+
+For example, a spam detector might learn that particular combinations of words are common in unwanted messages. It can then score an unfamiliar email using those learned patterns.
+
+## When Rules Are Not Enough
+
+Traditional programming follows explicit instructions written by a developer. Machine learning takes a different path: a learning algorithm searches for patterns using examples and produces a model that makes predictions.
+
+**Traditional approach:** human-designed rules + incoming email → spam or normal.
+
+**Machine learning approach:** labeled examples + learning algorithm → trained model; then trained model + incoming email → prediction.
+
+The difference matters when rules become difficult to maintain, when data contains subtle relationships, or when patterns change over time. This does **not** mean ML is always better: for simple, deterministic tasks, ordinary software rules are often clearer and more reliable.
+
+## The Learning Loop
+
+Most beginner ML systems can be understood through four steps:
+
+1. **Collect examples.** Each email is a *sample*. Its words provide *features*; its spam/normal category provides a *label*.
+2. **Train a model.** A learning algorithm uses the labeled examples to adjust the model's internal parameters.
+3. **Make predictions.** The trained model receives a new message and predicts its label. This step is called *inference*.
+4. **Evaluate on unseen examples.** Measure how well the model performs on messages it was not trained on.
+
+A convenient way to describe learning comes from the task–experience–performance framework in Géron's Chapter 1. For our spam filter, the **task** is classifying emails, **experience** is labeled training emails, and **performance** could be accuracy on a separate test set.
+
+<LessonWorkbench lab={<IntroMLSpamLab />} name="Spam Filter — Introduction to Machine Learning">
+
+## Interactive Experiment
+
+On the right is a small, real text classifier. Your job is to teach it which emails are spam and which are normal. It is a deliberately tiny learning system, not a production-quality spam filter.
+
+### 01 — Inspect the training examples
+
+Each email has a **label**. Click a label to change it, or add your own example. The model does not yet know which words matter; your examples provide that evidence.
+
+### 02 — Train the model
+
+Click **Train model**. The lab fits a simple *multinomial Naive Bayes* classifier: it counts words associated with each category and combines their likelihoods to score new emails.
+
+You do not need to memorize the algorithm yet. The important observation is that the program **learns its word associations from the labels** instead of using a hand-written list of spam keywords.
+
+### 03 — Test an unseen email
+
+Edit the message or choose a preset. Compare the learned model with the **fixed rule** on the right. The fixed rule only checks whether an email contains “free” or “win”; it never improves through training.
+
+The probability bar is a toy model's numerical score, not a guarantee that an email really is spam.
+
+### 04 — Change the evidence
+
+Relabel several training emails incorrectly, then retrain. Does the model become less reliable? Restore the examples with **Reset data** to compare fairly.
+
+### 05 — Inspect generalization
+
+The lab evaluates both approaches on **four fixed hold-out emails** that were not included during training. That separation matters: scoring a model using its training examples would tell us little about its ability to handle unseen email.
+
+The four examples make evaluation visible, but they are far too few to establish reliable real-world performance.
+
+## Types of Learning
+
+Géron introduces several ways to categorize ML systems. The first question is **what kind of feedback the model receives**.
+
+### Supervised learning
+
+The training data contains desired answers, usually called *labels*. Examples include spam detection (spam or normal), and house-price prediction (a numerical target). These are examples of **classification** and **regression**, respectively.
+
+### Unsupervised learning
+
+There are no target labels. Instead, a system might discover groups of similar customers, identify unusual transactions, or represent complex data in fewer dimensions.
+
+### Other important approaches
+
+In **semi-supervised learning**, only some examples carry labels. In **self-supervised learning**, the system creates training targets from the data itself, such as predicting hidden pieces of an image. In **reinforcement learning**, an agent learns through actions and rewards.
+
+These categories are not mutually exclusive. We will explore them in dedicated lessons.
+
+## Generalization and Evaluation
+
+A model that performs brilliantly on its training examples may still fail on new data. This is called **overfitting**. The opposite problem, **underfitting**, happens when a model is too simple to learn the useful patterns even in the training data.
+
+Data can also cause trouble. If examples are too few, biased, noisy, or incorrectly labeled, training may lead the model toward the wrong conclusions. A model cannot reliably recover information that its training examples never contain.
+
+To evaluate fairly, distinguish three roles:
+
+- **Training set:** used to fit model parameters.
+- **Validation set:** used to compare models and tune choices, when needed.
+- **Test set:** kept aside for the final estimate of performance on unseen data.
+
+One popular classification metric is *accuracy*: the fraction of examples predicted correctly. It is easy to understand, but it is not enough for every problem. For example, when fraudulent transactions are very rare, a detector can have deceptively high accuracy while missing the important cases.
+
+### Try this in the lab
+
+1. Train on the original labels and record the hold-out accuracy.
+2. Flip two labels from spam to normal, retrain, and compare.
+3. Add two correctly labeled examples containing a new distinctive word. Test a message using that word.
+4. Ask yourself: why should you avoid repeatedly modifying a model solely to improve its score on the same tiny test set?
+
+## Knowledge Check
+
+Before moving on, test whether you can identify learning from data, overfitting, and fair evaluation.
+
+<IntroMLQuiz />
+
+## Key Takeaways
+
+A **sample** is one training example. A **feature** is an input characteristic. A **label** is a desired output in supervised learning. A **model** maps inputs to predictions, and **training** adjusts it using examples.
+
+The central goal is not to memorize the training data. It is to **learn patterns that remain useful on new data**. Good examples, suitable algorithms, and honest evaluation all matter.
+
+Next, the course will explore the major types of ML in more depth. To explore how models can improve their parameters step by step, you can also open our existing <Link href="/learn/ml/gradient-descent">Gradient Descent experiment</Link>.
+
+## References and Further Reading
+
+**Primary textbook:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed., O'Reilly Media, 2022 (copyright 2023). **Chapter 1, “The Machine Learning Landscape,” pp. 3–38.** Especially: *What Is Machine Learning?* (p. 4), *Why Use Machine Learning?* (pp. 5–7), *Types of Machine Learning Systems* (pp. 9–26), *Main Challenges* (pp. 27–33), and *Testing and Validating* (pp. 34–36).
+
+**Companion exercises and notebooks:** [Aurélien Géron's official Hands-On ML 3 repository](https://github.com/ageron/handson-ml3). Read the Chapter 1 notebook for further examples and exercises.
+
+*This lesson, its text, its classifier, and its interactions were created for Jav's Lab. The reference book supplies the academic foundations; its figures and paragraphs are not reproduced here.*
+
+</LessonWorkbench>

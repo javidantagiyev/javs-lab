@@ -27,6 +27,12 @@ export const subjects: Subject[] = [
     artwork: "/art/ml.svg",
     lessons: [
       {
+        title: "Introduction to Machine Learning",
+        description: "Learn from examples, build a tiny spam detector, and discover generalization.",
+        href: "/learn/ml/introduction-to-machine-learning",
+        status: "available",
+      },
+      {
         title: "Gradient Descent",
         description: "See how optimization moves toward lower loss — one step at a time.",
         href: "/learn/ml/gradient-descent",
