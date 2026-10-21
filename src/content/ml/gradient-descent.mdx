@@ -1,0 +1,31 @@
+import GradientDescentLab from "@/components/labs/GradientDescentLab";
+
+## Introduction
+
+Gradient Descent is an optimization method used to reduce the value of a function.
+
+## The Mathematics
+
+For a differentiable one-dimensional function, we update our current point using:
+
+$$
+x_{n+1} = x_n - \alpha f'(x_n)
+$$
+
+Here, $\alpha$ is the learning rate and $f'(x_n)$ is the gradient at the current point.
+
+## Interactive Experiment
+
+Change the function, starting point, or learning rate. Click **Next Iteration** to watch the optimizer move.
+
+<GradientDescentLab />
+
+## Practice
+
+- What happens when the learning rate is too large?
+- Can you find a starting point that produces a zero gradient?
+- Does a zero gradient always mean you've found a minimum?
+
+## Summary
+
+Gradient Descent moves against the local gradient. The learning rate affects how far it moves on each step.
