@@ -293,28 +293,28 @@ export default function GradientDescentLab() {
   const axisX = toX(0);
   const axisY = toY(0);
   return (
-    <section className="my-10 overflow-hidden rounded-2xl border border-slate-700 bg-[#0b1220] text-slate-100 shadow-2xl">
-      <header className="border-b border-slate-800 p-5">
+    <section className="gd-compact javs-gd my-10 overflow-hidden rounded-2xl border border-slate-700 bg-[#0b1220] text-slate-100 shadow-2xl">
+      <header className="gd-header border-b border-slate-800 p-5">
         <p className="text-xs font-semibold uppercase tracking-wider text-blue-400">Jav's Lab / Interactive Experiment</p>
         <h2 className="mt-2 text-2xl font-bold">Gradient Descent Playground</h2>
         <p className="mt-1 text-sm text-slate-400">Type a function, then step through the optimization.</p>
       </header>
-      <div className="space-y-5 p-4 md:p-6">
-        <div>
+      <div className="gd-content space-y-5 p-4 md:p-6">
+        <div className="gd-expression">
           <label htmlFor="gd-expression" className="mb-2 block text-sm font-semibold">Function f(x)</label>
           <input id="gd-expression" type="text" autoComplete="off" spellCheck={false} value={expression}
             onChange={event => updateExpression(event.target.value)} placeholder="Try x^3 or sin(x) + x^2/5"
             className="w-full rounded-xl border border-slate-600 bg-slate-950 px-4 py-3 font-mono text-lg text-blue-300 outline-none focus:border-blue-400" />
           {parsed.message ? <p role="alert" className="mt-2 text-sm text-amber-400">{parsed.message}</p> :
             <p className="mt-2 text-xs text-slate-400">f'(x) = <span className="font-mono text-emerald-400">{math?.derivative}</span></p>}
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="gd-expression-presets mt-3 flex flex-wrap gap-2">
             {PRESETS.map(p => <button type="button" key={p.label} onClick={() => updateExpression(p.expression)}
               className="cursor-pointer rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs hover:border-blue-500">{p.label}</button>)}
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-slate-700 bg-[#080e1a]">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 p-3">
+        <div className="gd-chart overflow-hidden rounded-xl border border-slate-700 bg-[#080e1a]">
+          <div className="gd-chart-toolbar flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 p-3">
             <div className="flex flex-wrap gap-3 text-xs">
               <span className="text-blue-400">● Function</span>
               <span className="text-amber-400">● Steps</span>
@@ -361,10 +361,10 @@ export default function GradientDescentLab() {
               <p>y: <span className="text-blue-300">{fmt(hoverPoint.y)}</span></p>
             </div>}
           </div>
-          <p className="border-t border-slate-800 px-3 py-2 text-xs text-slate-400">Hover for coordinates · Drag the orange point to restart · Click to set start · Drag background to pan · Scroll to zoom</p>
+          <p className="gd-chart-help border-t border-slate-800 px-3 py-2 text-xs text-slate-400">Hover for coordinates · Drag the orange point to restart · Click to set start · Drag background to pan · Scroll to zoom</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="gd-params grid gap-4 md:grid-cols-2">
           <label className="rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm">
             <span className="flex justify-between"><span>Learning rate (α)</span><span className="font-mono text-blue-400">{learningRate.toFixed(2)}</span></span>
             <input type="range" min="0.01" max="1.5" step="0.01" value={learningRate} onChange={event => { setLearningRate(Number(event.target.value)); resetSteps(); }} className="mt-4 w-full cursor-pointer accent-blue-500" />
@@ -378,27 +378,27 @@ export default function GradientDescentLab() {
               className="mt-3 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 outline-none focus:border-blue-500" />
           </label>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="gd-metrics grid grid-cols-2 gap-3 md:grid-cols-4">
           {[["Iteration", String(history.length-1)],["Current X",fmt(displayedX)],["Loss f(x)",fmt(currentY)],["Gradient f'(x)",fmt(slope)]].map(([label,value]) =>
             <div key={label} className="rounded-xl border border-slate-800 bg-slate-900 p-4"><p className="text-xs text-slate-400">{label}</p><p className="mt-2 break-all font-mono text-lg font-semibold">{value}</p></div>)}
         </div>
-        <div className="rounded-xl border border-blue-900 bg-blue-950/20 p-4 text-sm">
+        <div className="gd-equation rounded-xl border border-blue-900 bg-blue-950/20 p-4 text-sm">
           <p className="font-medium text-blue-300">Update: x(next) = x − α × f'(x)</p>
           {math && Number.isFinite(slope) && <p className="mt-2 font-mono text-slate-300">{fmt(displayedX)} − {fmt(learningRate)} × ({fmt(slope)}) = {fmt(displayedX-learningRate*slope)}</p>}
           {history.length > 1 && Number.isFinite(slope) && Math.abs(slope)<0.0001 && <p className="mt-2 text-emerald-300">Gradient is approximately zero (stationary point; not necessarily a minimum).</p>}
         </div>
-        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
+        <div className="gd-visibility flex flex-wrap items-center gap-3 text-xs text-slate-300">
           <label className="flex cursor-pointer items-center gap-2"><input type="checkbox" checked={showTangent} onChange={event => setShowTangent(event.target.checked)}/> Show tangent</label>
           <label className="flex cursor-pointer items-center gap-2"><input type="checkbox" checked={showHistory} onChange={event => setShowHistory(event.target.checked)}/> Show steps</label>
         </div>
-        {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
-        <div className="flex flex-wrap gap-3">
-          <button type="button" disabled={!math || !!error || animating || history.length > LIMIT} onClick={nextStep}
+        {error && <p role="alert" className="gd-error text-sm text-red-400">{error}</p>}
+        <div className="gd-actions flex flex-wrap gap-3">
+          <button type="button" disabled={!math || !!error || animating || history.length > LIMIT} onClick={nextStep} data-javs-primary="true"
             className="min-w-36 flex-1 cursor-pointer rounded-xl bg-blue-600 px-5 py-3 font-semibold hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40">{animating ? "Moving…" : "Next iteration →"}</button>
           <button type="button" disabled={history.length<2 || animating} onClick={() => { const previous = history[history.length-2]; stopAnimation(previous); setHistory(h => h.slice(0,-1)); setError(""); }} className="cursor-pointer rounded-xl border border-slate-700 px-5 py-3 disabled:cursor-not-allowed disabled:opacity-40">Undo</button>
           <button type="button" onClick={() => resetSteps()} className="cursor-pointer rounded-xl border border-slate-700 px-5 py-3">Reset steps</button>
         </div>
-        {math && history.length>1 && <details className="rounded-xl border border-slate-800 p-4"><summary className="cursor-pointer font-medium">Iteration history ({history.length-1} steps)</summary>
+        {math && history.length>1 && <details className="gd-history rounded-xl border border-slate-800 p-4"><summary className="cursor-pointer font-medium">Iteration history ({history.length-1} steps)</summary>
           <div className="mt-3 max-h-64 overflow-auto"><table className="w-full text-left text-sm"><thead><tr className="text-slate-400"><th>Step</th><th>X</th><th>f(x)</th><th>f'(x)</th></tr></thead><tbody>
             {history.map((x,i) => <tr key={i} className="border-t border-slate-800"><td className="py-2">{i}</td><td>{fmt(x)}</td><td>{fmt(math.f(x))}</td><td>{fmt(math.df(x))}</td></tr>)}
           </tbody></table></div></details>}

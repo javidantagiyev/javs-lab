@@ -19,19 +19,38 @@ const subjectLabels: Record<string, string> = {
 
 export default function LessonLayout({ title, description, subject, difficulty, children }: Props) {
   return (
-    <>
-      <main className="mx-auto max-w-7xl px-4 pb-24 pt-8 sm:px-6">
-        <div className="mb-8">
-          <Link href="/" className="cursor-pointer text-sm text-blue-400 hover:text-blue-300">← Back to Jav&apos;s Lab</Link>
-          <p className="mt-8 text-sm font-medium text-blue-400">{subjectLabels[subject] ?? subject} / {difficulty}</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">{title}</h1>
-          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-400">{description}</p>
+    <main className="javs-lesson">
+      <div className="javs-lesson-hero">
+        <div className="javs-lesson-shell">
+          <div className="javs-lesson-hero-top">
+            <Link href={`/subjects/${subject}`} className="javs-lesson-back">← &nbsp; {subjectLabels[subject] ?? subject}</Link>
+            <span className="javs-lesson-edition">JAV&apos;S LAB &nbsp; / &nbsp; INTERACTIVE NOTES</span>
+          </div>
+          <div className="javs-lesson-hero-main">
+            <div>
+              <p className="javs-lesson-kicker"><span className="javs-lesson-status-dot" /> {subjectLabels[subject] ?? subject} <span className="javs-lesson-slash">/</span> {difficulty}</p>
+              <h1>{title}<span className="javs-lesson-gold">.</span></h1>
+              <p className="javs-lesson-lead">{description}</p>
+            </div>
+            <div className="javs-lesson-hero-mark" aria-hidden="true">
+              <div className="javs-lesson-orbit orbit-one" />
+              <div className="javs-lesson-orbit orbit-two" />
+              <span>∇</span>
+            </div>
+          </div>
+          <div className="javs-lesson-hero-foot"><span>READ THE THEORY</span><span className="javs-lesson-hero-arrow">↓</span><span>RUN THE EXPERIMENT</span></div>
         </div>
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_240px]">
-          <article id="lesson-article" className="lesson-content min-w-0">{children}</article>
-          <div className="order-first lg:order-last"><LessonNavigation /></div>
+      </div>
+      <LessonNavigation />
+      <div className="javs-lesson-shell javs-lesson-body">
+        <article id="lesson-article" className="lesson-content javs-lesson-article">
+          {children}
+        </article>
+        <div className="javs-lesson-bottom">
+          <span>END OF LESSON &nbsp; / &nbsp; KEEP EXPERIMENTING</span>
+          <Link href={`/subjects/${subject}`}>Back to {subjectLabels[subject] ?? subject} ↗</Link>
         </div>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }

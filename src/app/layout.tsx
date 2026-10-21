@@ -3,6 +3,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 import "./home.css";
+import "./lesson.css";
 
 export const metadata: Metadata = {
   title: { default: "Jav's Lab", template: "%s | Jav's Lab" },

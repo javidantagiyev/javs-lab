@@ -1,0 +1,326 @@
+/* JAV'S LAB — WORKBENCH V1
+   Deliberately scoped: does not alter the existing homepage or subject cards. */
+.javs-lesson {
+  --jl-bg: #090a0a;
+  --jl-panel: #101111;
+  --jl-panel-2: #161615;
+  --jl-line: #33302a;
+  --jl-gold: #d0ac78;
+  --jl-gold-light: #eccd9b;
+  --jl-fg: #eeeae4;
+  --jl-muted: #aaa59b;
+  background: var(--jl-bg);
+  color: var(--jl-fg);
+  min-height: 100svh;
+  isolation: isolate;
+}
+.javs-lesson-shell { width: min(calc(100% - 90px), 1440px); margin-inline: auto; }
+.javs-lesson a, .javs-lesson button, .javs-lesson summary { cursor: pointer; }
+.javs-lesson a:focus-visible, .javs-lesson button:focus-visible,
+.javs-lesson [tabindex="0"]:focus-visible { outline: 2px solid var(--jl-gold); outline-offset: 4px; }
+.javs-lesson-hero {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 55% 100% at 80% 66%, rgba(108,77,42,.10), transparent 80%), #0a0b0b;
+  border-bottom: 1px solid #252521;
+}
+.javs-lesson-hero::before {
+  content: "∑    ∇      α    ∂         x      ∫     f′     ∆       π        ϕ       ∑       ∇";
+  pointer-events: none;
+  position: absolute;
+  left: 30%; top: -15px; right: -5%; bottom: 0;
+  color: #e2b67d; opacity: .10;
+  font: 25px/3.6 ui-monospace, Consolas, monospace;
+  letter-spacing: 3.1rem;
+  overflow: hidden;
+  transform: rotate(-11deg);
+  mask-image: linear-gradient(90deg,transparent,#000 55%,transparent);
+}
+.javs-lesson-hero-top, .javs-lesson-hero-foot, .javs-workbench-head, .javs-workbench-footer,
+.javs-pane-eyebrow, .javs-reading-end, .javs-lesson-bottom,
+.javs-lesson-kicker, .javs-lesson-edition, .javs-nav-identity, .javs-nav-link, .javs-nav-progress {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+.javs-lesson-hero-top {
+  padding-top: 32px;
+  display: flex; justify-content: space-between; align-items: center; gap: 20px;
+  color: #a49b8d; font-size: 11px; letter-spacing: .08em;
+}
+.javs-lesson-back { color: #d4b186; text-decoration: none; transition: color .2s; }
+.javs-lesson-back:hover { color: #f1d4a6; }
+.javs-lesson-edition { font-size: 10px; color: #827a6e; }
+.javs-lesson-hero-main {
+  position: relative; display: flex; align-items: center; justify-content: space-between;
+  padding: 52px 0 63px; min-height: 300px;
+}
+.javs-lesson-kicker {
+  display: flex; gap: 12px; align-items: center; margin: 0 0 19px;
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #d1b28a;
+}
+.javs-lesson-status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #d9b17a; box-shadow: 0 0 14px #c28d49aa; }
+.javs-lesson-slash { color: #716453; }
+.javs-lesson-hero h1 { margin: 0; font: 400 clamp(50px, 6.4vw, 92px)/1.07 Georgia, "Times New Roman", serif; letter-spacing: -.06em; color: #f1ede6; }
+.javs-lesson-gold { color: var(--jl-gold); }
+.javs-lesson-lead { margin: 21px 0 0; max-width: 780px; font-size: clamp(15px,1.4vw,19px); line-height: 1.8; color: #b9b3a8; }
+.javs-lesson-hero-mark { position: relative; flex: 0 0 245px; height: 180px; display: flex; justify-content: center; align-items: center; margin-right: 6%; opacity: .77; }
+.javs-lesson-hero-mark > span { z-index: 1; color: #d6b27d; font: 400 80px Georgia,serif; }
+.javs-lesson-orbit { position: absolute; left: 50%; top: 50%; border: 1px solid #67553a; border-radius: 50%; transform: translate(-50%,-50%) rotate(-24deg); }
+.javs-lesson-orbit.orbit-one { width: 240px; height: 104px; }
+.javs-lesson-orbit.orbit-two { width: 120px; height: 228px; transform: translate(-50%,-50%) rotate(21deg); }
+.javs-lesson-hero-foot { border-top: 1px solid #39352d; height: 44px; display: flex; justify-content: space-between; align-items: center; color: #8f8372; letter-spacing: .14em; font-size: 9px; }
+.javs-lesson-hero-arrow { color: #d9b67d; font-size: 19px; }
+
+/* Persistent chapter navigation: gold, subtle, not an old blue sidebar. */
+.javs-lesson-nav {
+  position: sticky; top: 76px; z-index: 40; background: rgba(10,11,11,.96);
+  border-bottom: 1px solid #42382b; backdrop-filter: blur(20px);
+}
+.javs-nav-layout { height: 69px; display: flex; align-items: stretch; gap: 26px; min-width: 0; }
+.javs-nav-identity { flex-shrink: 0; display: flex; align-items: center; gap: 9px; font-size: 10px; letter-spacing: .12em; color: #baa080; }
+.javs-nav-identity > span { color: #c9a16b; font-size: 25px; }
+.javs-nav-links { flex: 1; display: flex; gap: 6px; min-width: 0; align-items: stretch; overflow-x: auto; scrollbar-width: none; }
+.javs-nav-links::-webkit-scrollbar { display: none; }
+.javs-nav-link { position: relative; flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: 2px solid transparent; color: #96928a; font-size: 11px; text-decoration: none; white-space: nowrap; transition: color .2s, background .2s; }
+.javs-nav-link:hover { color: #f2dfbd; background: rgba(205,166,111,.07); }
+.javs-nav-link.is-active { color: #e4c393; border-bottom-color: #d1a96e; background: rgba(204,168,117,.07); }
+.javs-nav-num { color: #776b5d; font-size: 9px; }
+.javs-nav-link.is-active .javs-nav-num { color: #ae8960; }
+.javs-nav-progress { flex-shrink: 0; display: flex; gap: 12px; align-items: center; color: #868076; font-size: 9px; letter-spacing: .08em; }
+.javs-nav-progress strong { color: #e5c08b; font: 500 12px ui-monospace,Consolas,monospace; }
+.javs-nav-progress-track { position: absolute; height: 2px; bottom: -1px; left: 0; width: 100%; pointer-events: none; background: transparent; }
+.javs-nav-progress-track > div { height: 100%; background: linear-gradient(90deg,#6b563b,#d2ac74); transition: width 150ms ease-out; }
+.javs-nav-mobile-button, .javs-nav-mobile-menu { display: none; }
+
+/* Readable first act, then split experiment. */
+.javs-lesson-body { padding-top: 69px; padding-bottom: 90px; }
+.javs-lesson-article { min-width: 0; }
+.javs-lesson-article > :not(.javs-workbench) { max-width: 890px; }
+.javs-mdx-h2 { color: #f2ece2; font: 400 clamp(31px, 3vw, 43px)/1.2 Georgia,"Times New Roman",serif; letter-spacing: -.037em; margin: 56px 0 22px; scroll-margin-top: 177px; }
+.javs-lesson-article > .javs-mdx-h2:first-child { margin-top: 0; }
+.javs-mdx-h3 { font: 500 18px/1.35 ui-sans-serif,Arial,sans-serif; letter-spacing: -.015em; color: #eddfca; margin: 31px 0 12px; scroll-margin-top: 177px; }
+.javs-mdx-p { color: #c2beb7; font-size: 16px; line-height: 1.95; margin: 0 0 22px; }
+.javs-mdx-p strong { color: #efe5d2; font-weight: 600; }
+.javs-mdx-p em { color: #d7bd94; }
+.javs-mdx-link { color: #d6ac73; text-decoration: underline; text-underline-offset: 4px; }
+.javs-mdx-link:hover { color: #f4d19d; }
+.javs-mdx-list { padding-left: 22px; margin: 6px 0 27px; list-style: disc; color: #c2beb7; line-height: 1.85; }
+.javs-mdx-numbered { list-style-type: decimal; }
+.javs-mdx-li { padding: 0 0 9px 5px; }
+.javs-mdx-li::marker { color: #b7986c; }
+.javs-mdx-code { color: #e0c08d; background: #211e18; border: 1px solid #373127; border-radius: 5px; padding: 2px 6px; font: .88em ui-monospace,Consolas,monospace; }
+.javs-mdx-pre { background: #171714; border: 1px solid #39342c; border-radius: 10px; padding: 18px; margin: 24px 0; overflow-x: auto; }
+.javs-mdx-pre .javs-mdx-code { border: 0; padding: 0; background: none; }
+.javs-mdx-quote { border-left: 2px solid #c6a577; background: #171612; margin: 24px 0; padding: 22px 27px; color: #e0d0b8; }
+.javs-lesson-article > .katex-display { margin: 23px 0 27px; background: linear-gradient(125deg,#141411,#1a1813); border: 1px solid #393126; border-radius: 12px; padding: 22px 15px; color: #ebd1a8; font-size: 1.3rem; }
+.javs-lesson-article .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+.javs-lesson-article .katex:not(.katex-display .katex) { color: #e1c393; }
+
+/* The workbench: exactly one lab, exactly two independent scroll areas. */
+.javs-workbench { margin-top: 82px; scroll-margin-top: 172px; border: 1px solid #3c352b; border-radius: 12px; background: #0d0f0e; overflow: hidden; box-shadow: 0 33px 90px rgba(0,0,0,.24); }
+.javs-workbench-head { padding: 19px 23px; min-height: 60px; display: flex; gap: 20px; align-items: center; justify-content: space-between; border-bottom: 1px solid #363026; font-size: 10px; letter-spacing: .15em; color: #d1b58c; }
+.javs-workbench-small-index { color: #927650; }
+.javs-workbench-head-right { display: flex; align-items: center; gap: 12px; color: #898071; }
+.javs-workbench-live,.javs-panel-live-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #d4ac72; box-shadow: 0 0 10px #ab7d46; }
+.javs-workbench-grid { display: grid; grid-template-columns: minmax(320px, .85fr) minmax(0,1.45fr); height: min(770px,calc(100svh - 185px)); min-height: 580px; }
+.javs-workbench-reading, .javs-workbench-lab { overflow-y: auto; overflow-x: hidden; min-height: 0; scrollbar-width: thin; scrollbar-color: #68543a #141514; overscroll-behavior: auto; }
+.javs-workbench-reading { border-right: 1px solid #3c352a; background: radial-gradient(ellipse at 2% 0%,rgba(168,124,65,.08),transparent 50%), #121310; }
+.javs-workbench-lab { background: #0d0e0c; }
+.javs-workbench-reading-inner { padding: 26px clamp(22px,2.7vw,43px) 45px; }
+.javs-workbench-lab-inner { padding: 26px clamp(12px,1.55vw,25px) 35px; }
+.javs-pane-eyebrow { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 30px; font-size: 10px; letter-spacing: .12em; color: #a89a84; }
+.javs-pane-eyebrow > span:first-child { color: #d1a971; }
+.javs-workbench-reading .javs-mdx-h2 { font-size: clamp(29px,2.5vw,39px); margin: 39px 0 22px; scroll-margin-top: 28px; }
+.javs-workbench-reading .javs-mdx-h2:first-of-type { margin-top: 0; }
+.javs-workbench-reading .javs-mdx-h3 { font-size: 17px; }
+.javs-workbench-reading .javs-mdx-p { font-size: 14px; line-height: 1.9; }
+.javs-workbench-reading .javs-mdx-list { font-size: 14px; }
+.javs-reading-end { padding-top: 26px; margin-top: 35px; border-top: 1px solid #373126; color: #897b66; font-size: 10px; letter-spacing: .08em; display: flex; justify-content: space-between; gap: 8px; }
+.javs-reading-end span { color: #d0a76f; }
+.javs-workbench-footer { display: flex; justify-content: space-between; gap: 14px; padding: 13px 22px; background: #111210; border-top: 1px solid #343025; color: #827b70; font-size: 9px; letter-spacing: .1em; }
+.javs-lesson-bottom { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 38px 0; margin-top: 85px; border-top: 1px solid #39342d; color: #94897b; font-size: 10px; letter-spacing: .07em; }
+.javs-lesson-bottom a { color: #d0a979; text-decoration: none; }
+.javs-lesson-bottom a:hover { color: #eacb99; }
+
+/* Native lab visuals: all controls and pointer/zoom behavior remain identical. */
+.javs-lesson .javs-gd { margin: 0 !important; color: #efe9df !important; background: radial-gradient(ellipse at 90% 0%,rgba(164,118,58,.08), transparent 38%),#0e0f0d !important; border-color: #41392b !important; border-radius: 10px !important; box-shadow: none !important; }
+.javs-lesson .javs-gd > header { padding: 20px !important; border-color: #363025 !important; }
+.javs-lesson .javs-gd > header > p:first-child { color: #cba772 !important; letter-spacing: .14em; font-size: 10px; }
+.javs-lesson .javs-gd > header h2 { font: 400 clamp(21px,2.1vw,29px)/1.3 Georgia,serif !important; color: #eae2d4 !important; }
+.javs-lesson .javs-gd > header > p:last-child { color: #aaa59b !important; }
+.javs-lesson .javs-gd :is(input[type="text"],input[type="range"], input[type="checkbox"]) { accent-color: #c9a46f; }
+.javs-lesson .javs-gd input[type="text"] { background: #0e0f0e !important; color: #ead0a2 !important; border-color: #4b4132 !important; }
+.javs-lesson .javs-gd input[type="text"]:focus-visible { border-color: #cba66f !important; outline: 2px solid #8c7048; outline-offset: 1px; }
+.javs-lesson .javs-gd button { cursor: pointer; transition: background-color .18s,border-color .18s,color .18s; }
+.javs-lesson .javs-gd button:hover:not(:disabled) { border-color: #a68559 !important; }
+.javs-lesson .javs-gd button:focus-visible { outline: 2px solid #d8b781; outline-offset: 3px; }
+.javs-lesson .javs-gd button:disabled { cursor: not-allowed; }
+.javs-lesson .javs-gd [data-javs-primary="true"] { background: #d4b17c !important; border: 1px solid #d4b17c; color: #20170e !important; }
+.javs-lesson .javs-gd [data-javs-primary="true"]:hover:not(:disabled) { background: #ebc998 !important; }
+.javs-lesson .javs-gd svg { background: radial-gradient(ellipse at 53% 30%,#191812 0%,#0c0d0c 90%); }
+.javs-lesson .javs-gd svg [stroke="#60a5fa"] { stroke: #d5ae77 !important; }
+.javs-lesson .javs-gd svg [fill="#60a5fa"] { fill: #d5ae77 !important; }
+.javs-lesson .javs-gd svg [stroke="#34d399"] { stroke: #88bbae !important; }
+.javs-lesson .javs-gd svg [stroke="#f59e0b"] { stroke: #dfa65b !important; }
+.javs-lesson .javs-gd svg [fill="#f59e0b"] { fill: #dfa65b !important; }
+.javs-lesson .javs-gd svg [stroke="#334155"] { stroke: #4b4438 !important; }
+.javs-lesson .javs-gd svg [stroke="#a4b4c9"] { stroke: #8e8474 !important; }
+.javs-lesson .javs-gd svg [fill="#94a3b8"],.javs-lesson .javs-gd svg [fill="#cbd5e1"] { fill: #aba08d !important; }
+.javs-lesson .javs-gd .text-blue-400,.javs-lesson .javs-gd .text-blue-300 { color: #d1ae7a !important; }
+.javs-lesson .javs-gd .text-slate-400 { color: #a9a49a !important; }
+.javs-lesson .javs-gd .bg-slate-900,.javs-lesson .javs-gd .bg-slate-800 { background: #181916 !important; }
+.javs-lesson .javs-gd .border-slate-700,.javs-lesson .javs-gd .border-slate-800 { border-color: #3a352c !important; }
+.javs-lesson .javs-gd details[open] { border-color: #65523a; }
+
+@media (max-width: 1260px) {
+ .javs-lesson-shell { width: min(calc(100% - 58px),1440px); }
+ .javs-nav-layout { gap: 12px; }
+ .javs-nav-identity { display: none; }
+ .javs-nav-link { padding-inline: 11px; }
+ .javs-workbench-grid { grid-template-columns: minmax(300px,.9fr) minmax(0,1.3fr); }
+}
+@media (max-width: 1023px) {
+ .javs-lesson-hero-mark { flex-basis: 175px; transform: scale(.73); margin-right: 0; }
+ .javs-workbench-grid { display: flex; flex-direction: column; height: auto; min-height: 0; }
+ .javs-workbench-reading, .javs-workbench-lab { overflow: visible; min-height: auto; }
+ .javs-workbench-reading { border-right: 0; border-bottom: 1px solid #3c352a; }
+ .javs-workbench-reading-inner { padding: 28px; }
+ .javs-workbench-lab-inner { padding: 25px; }
+ .javs-workbench-footer span:first-child { display: none; }
+ .javs-workbench-footer::before { content: "SCROLL TO EXPLORE"; }
+ .javs-nav-progress { margin-left: auto; }
+}
+@media (max-width: 700px) {
+ .javs-lesson-shell { width: calc(100% - 38px); }
+ .javs-lesson-hero-top { padding-top: 22px; }
+ .javs-lesson-edition { display: none; }
+ .javs-lesson-hero-main { min-height: 0; padding: 42px 0 55px; }
+ .javs-lesson-hero-mark { display: none; }
+ .javs-lesson-hero h1 { font-size: clamp(44px,10vw,64px); }
+ .javs-lesson-hero-foot { font-size: 8px; }
+ .javs-lesson-nav { top: 65px; }
+ .javs-nav-layout { height: 56px; align-items: center; }
+ .javs-nav-links, .javs-nav-progress { display: none; }
+ .javs-nav-mobile-button { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; padding: 10px 0; text-align: left; color: #dec396; font: 12px ui-monospace,Consolas,monospace; background: transparent; border: 0; }
+ .javs-nav-mobile-button > span { font-size: 19px; }
+ .javs-nav-mobile-menu { display: flex; flex-direction: column; padding: 7px 19px 17px; border-top: 1px solid #40362a; background: #12120f; max-height: 62svh; overflow-y: auto; }
+ .javs-nav-mobile-menu a { padding: 12px 9px; color: #ada79a; border-bottom: 1px solid #302c25; text-decoration: none; font-size: 13px; }
+ .javs-nav-mobile-menu a.is-active { color: #e5c38e; }
+ .javs-lesson-body { padding-top: 37px; }
+ .javs-mdx-h2 { margin: 38px 0 15px; font-size: 32px; }
+ .javs-mdx-p { font-size: 15px; }
+ .javs-lesson-article > .katex-display { font-size: 1rem; }
+ .javs-workbench { margin-top: 55px; }
+ .javs-workbench-head { padding: 16px; font-size: 9px; }
+ .javs-workbench-head-right { display: none; }
+ .javs-workbench-reading-inner { padding: 23px 19px; }
+ .javs-workbench-lab-inner { padding: 19px 10px; }
+ .javs-lesson .javs-gd > header { padding: 16px !important; }
+ .javs-workbench-footer { padding-inline: 12px; }
+ .javs-lesson-bottom { flex-direction: column; align-items: start; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .javs-lesson * { scroll-behavior: auto !important; transition: none !important; }
+}
+/* Covers previous lab versions that still contain blue utility classes. */
+.javs-lesson .javs-gd [class*="bg-blue-950"] { background: linear-gradient(115deg,rgba(198,151,76,.13),rgba(198,151,76,.025)) !important; border-color: #51412f !important; }
+.javs-lesson .javs-gd [class*="bg-blue-600"] { background: #d4b17c !important; color: #21170b !important; }
+.javs-lesson .javs-gd [class*="bg-blue-600"]:hover:not(:disabled) { background: #eac897 !important; }
+.javs-lesson .javs-gd .accent-blue-500 { accent-color: #c9a46f !important; }
+
+/* Small readability refinements for the existing subject catalog, not the homepage. */
+.jav-catalog-page .jav-catalog-head p { max-width: 590px; font-size: 16px; line-height: 1.95; }
+.jav-catalog-page .jav-catalog-section-title { letter-spacing: .13em; }
+.jav-catalog-page .jav-catalog-lesson { padding-block: 36px; }
+.jav-catalog-page .jav-catalog-lesson p { font-size: 14px; line-height: 1.7; }
+.jav-catalog-page .jav-catalog-arrow { transition: transform .22s ease; }
+.jav-catalog-page .jav-catalog-lesson:hover .jav-catalog-arrow { transform: translate(3px,-3px); }
+.jav-catalog-page .jav-empty-state p { font-size: 15px; }
+.javs-lesson-nav::before {
+  content: "∇  ∑  ∂  α  π  f′  ∇  ∑";
+  position: absolute; inset: 0 9% 0 auto; width: 320px;
+  display: flex; align-items: center;
+  color: #a68658; opacity: .06; letter-spacing: 20px;
+  font: 16px ui-monospace,Consolas,monospace;
+  overflow: hidden; pointer-events: none; white-space: nowrap;
+}
+
+/* JAV'S LAB — COMPACT WORKBENCH V1.2
+   Opt-in via .gd-compact. No effect on home or subject pages. */
+@media (min-width: 1024px) {
+  .javs-workbench-lab-inner { padding: 12px 15px 18px; }
+  .javs-workbench-lab .javs-pane-eyebrow { margin-bottom: 10px; font-size: 9px; }
+  .javs-lesson .javs-gd.gd-compact { border-radius: 9px !important; }
+  .javs-lesson .gd-compact .gd-header { padding: 9px 13px !important; }
+  .javs-lesson .gd-compact .gd-header > p:first-child { font-size: 9px !important; }
+  .javs-lesson .gd-compact .gd-header h2 { margin-top: 3px !important; font-size: 19px !important; line-height: 1.2 !important; }
+  .javs-lesson .gd-compact .gd-header > p:last-child { display: none; }
+  .javs-lesson .gd-compact .gd-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(238px, .9fr);
+    grid-template-areas:
+      'expr expr'
+      'chart params'
+      'chart metrics'
+      'chart equation'
+      'chart visibility'
+      'actions actions'
+      'history history';
+    gap: 8px 12px;
+    align-content: start;
+    padding: 10px 12px 12px !important;
+  }
+  .javs-lesson .gd-compact .gd-content > * { margin: 0 !important; min-width: 0; }
+  .javs-lesson .gd-compact .gd-expression { grid-area: expr; display: grid; grid-template-columns: minmax(0,1fr) auto; grid-template-rows: auto auto auto; column-gap: 16px; align-items: center; }
+  .javs-lesson .gd-compact .gd-expression > label { grid-column: 1; grid-row: 1; font-size: 11px; margin-bottom: 3px !important; }
+  .javs-lesson .gd-compact .gd-expression > input { grid-column: 1; grid-row: 2; padding: 6px 10px !important; height: 35px; font-size: 14px !important; border-radius: 7px; }
+  .javs-lesson .gd-compact .gd-expression > p { grid-column: 1; grid-row: 3; font-size: 10px; margin: 3px 0 0 !important; line-height: 1.3; overflow-wrap: anywhere; }
+  .javs-lesson .gd-compact .gd-expression-presets { grid-column: 2; grid-row: 1 / span 3; margin: 0 !important; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px !important; }
+  .javs-lesson .gd-compact .gd-expression-presets > button { padding: 4px 8px !important; font-size: 10px; white-space: nowrap; border-radius: 5px; }
+  .javs-lesson .gd-compact .gd-chart { grid-area: chart; align-self: start; }
+  .javs-lesson .gd-compact .gd-chart-toolbar { padding: 7px 9px !important; gap: 5px !important; }
+  .javs-lesson .gd-compact .gd-chart-toolbar > div:first-child { font-size: 10px; gap: 8px !important; }
+  .javs-lesson .gd-compact .gd-chart-toolbar > div:last-child { gap: 4px !important; }
+  .javs-lesson .gd-compact .gd-chart-toolbar button { padding: 3px 8px !important; font-size: 11px; }
+  .javs-lesson .gd-compact .gd-chart svg { width: 100%; height: auto; display: block; }
+  .javs-lesson .gd-compact .gd-chart-help { padding: 6px 9px !important; font-size: 10px !important; line-height: 1.35; }
+  .javs-lesson .gd-compact .gd-params { grid-area: params; display: grid; grid-template-columns: minmax(0,1fr) !important; gap: 6px !important; align-content: start; }
+  .javs-lesson .gd-compact .gd-params > label { padding: 7px 9px !important; font-size: 11px !important; border-radius: 7px; }
+  .javs-lesson .gd-compact .gd-params input[type='range'] { margin-top: 5px !important; }
+  .javs-lesson .gd-compact .gd-params input[type='text'] { margin-top: 4px !important; padding: 4px 8px !important; height: 27px; font-size: 12px; border-radius: 5px; }
+  .javs-lesson .gd-compact .gd-metrics { grid-area: metrics; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 6px !important; align-content: start; }
+  .javs-lesson .gd-compact .gd-metrics > div { padding: 6px 9px !important; border-radius: 7px; min-width: 0; }
+  .javs-lesson .gd-compact .gd-metrics p:first-child { font-size: 10px !important; line-height: 1.3; }
+  .javs-lesson .gd-compact .gd-metrics p:last-child { font-size: 14px !important; margin-top: 3px !important; }
+  .javs-lesson .gd-compact .gd-equation { grid-area: equation; padding: 7px 9px !important; font-size: 11px !important; border-radius: 7px; }
+  .javs-lesson .gd-compact .gd-equation p { line-height: 1.35; }
+  .javs-lesson .gd-compact .gd-equation p + p { margin-top: 3px !important; font-size: 10px; }
+  .javs-lesson .gd-compact .gd-visibility { grid-area: visibility; font-size: 11px !important; gap: 8px !important; align-self: start; }
+  .javs-lesson .gd-compact .gd-actions { grid-area: actions; display: grid; grid-template-columns: minmax(0,2fr) minmax(0,.7fr) minmax(0,.95fr); gap: 7px !important; }
+  .javs-lesson .gd-compact .gd-actions button { min-width: 0 !important; padding: 9px 8px !important; font-size: 12px; border-radius: 7px; }
+  .javs-lesson .gd-compact .gd-history { grid-area: history; padding: 11px !important; font-size: 12px; }
+  .javs-lesson .gd-compact .gd-error { grid-column: 1/-1; font-size: 11px !important; }
+}
+
+/* When the right workbench column is narrow, use one compact vertical stack.
+   This is measured against the LAB width, rather than just the window width. */
+.javs-workbench-lab { container-type: inline-size; }
+@container (max-width: 635px) {
+  .javs-lesson .gd-compact .gd-content {
+    grid-template-columns: minmax(0,1fr);
+    grid-template-areas: 'expr' 'chart' 'params' 'metrics' 'equation' 'visibility' 'actions' 'history';
+  }
+  .javs-lesson .gd-compact .gd-params { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+  .javs-lesson .gd-compact .gd-metrics { grid-template-columns: repeat(4,minmax(0,1fr)) !important; }
+}
+@media (max-width: 1023px) {
+  /* On phones and tablets the existing stacked lesson layout is deliberately preserved. */
+  .javs-lesson .gd-compact .gd-content { display: block; }
+  .javs-lesson .gd-compact .gd-content > * + * { margin-top: 14px; }
+}
+@media (min-width: 1024px) and (max-height: 800px) {
+  /* Keep core actions discoverable even on shorter laptop screens. */
+  .javs-lesson .gd-compact .gd-chart-help { font-size: 9px !important; }
+  .javs-lesson .gd-compact .gd-header { padding-block: 6px !important; }
+  .javs-lesson .gd-compact .gd-content { gap: 6px 10px; padding-block: 7px !important; }
+}
+

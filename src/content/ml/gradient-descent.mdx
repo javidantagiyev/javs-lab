@@ -1,8 +1,11 @@
 import GradientDescentLab from "@/components/labs/GradientDescentLab";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
 
 ## Introduction
 
-Gradient Descent is an optimization method used to reduce the value of a function.
+Gradient Descent is an optimization method used to **reduce the value of a function**. Imagine standing on a hill with your eyes closed: the slope beneath your feet tells you which direction leads downhill.
+
+Instead of guessing where the minimum lies, the algorithm uses that local slope to decide its next move. Repeating the process produces a sequence of points that may approach a minimum.
 
 ## The Mathematics
 
@@ -12,20 +15,46 @@ $$
 x_{n+1} = x_n - \alpha f'(x_n)
 $$
 
-Here, $\alpha$ is the learning rate and $f'(x_n)$ is the gradient at the current point.
+Here, $\alpha$ is the **learning rate** (step size) and $f'(x_n)$ is the **gradient** at the current point.
+
+A positive gradient means the curve rises as you move right, so the update moves left. A negative gradient moves you right. The learning rate controls how far you travel on each step.
+
+<LessonWorkbench lab={<GradientDescentLab />} name="Gradient Descent">
 
 ## Interactive Experiment
 
-Change the function, starting point, or learning rate. Click **Next Iteration** to watch the optimizer move.
+The plot on the right is your live optimization playground. Try changing a value here, then observe how the curve and iterations respond.
 
-<GradientDescentLab />
+### 01 — Choose a function
+
+Start with `x^2`, which has a minimum at zero. Try **Double well** or **Wave** from the presets to explore more interesting shapes.
+
+### 02 — Set the starting point
+
+Change **Starting X**, or drag the highlighted point on the graph. This is where the algorithm begins.
+
+### 03 — Adjust the learning rate
+
+A small learning rate takes cautious steps. A large one can move faster, but it may jump past the minimum or even diverge.
+
+### 04 — Iterate
+
+Press **Next iteration** repeatedly. Watch how the current coordinate, loss, and gradient change. Use **Undo** or **Reset steps** to compare different choices.
 
 ## Practice
 
-- What happens when the learning rate is too large?
-- Can you find a starting point that produces a zero gradient?
-- Does a zero gradient always mean you've found a minimum?
+Use the experiment to investigate these questions:
+
+1. What happens when you set a learning rate that is too large?
+2. Can you find a starting point with a zero gradient?
+3. Does a zero gradient always mean you've found a minimum?
+
+Try the **Double well** preset. Observe how the starting point can determine which local minimum you approach.
 
 ## Summary
 
-Gradient Descent moves against the local gradient. The learning rate affects how far it moves on each step.
+Gradient Descent moves **against the local gradient**. The learning rate determines the size of each move, while the shape of the function and the starting point influence where you end up.
+
+The key idea: *the algorithm doesn't know the entire landscape—it responds to the slope where it is now.*
+
+</LessonWorkbench>
