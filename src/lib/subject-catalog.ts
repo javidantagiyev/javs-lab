@@ -33,6 +33,12 @@ export const subjects: Subject[] = [
         status: "available",
       },
       {
+        title: "Types of Machine Learning",
+        description: "Explore labels, clustering, self-supervision, and rewards.",
+        href: "/learn/ml/types-of-machine-learning",
+        status: "available",
+      },
+      {
         title: "Gradient Descent",
         description: "See how optimization moves toward lower loss — one step at a time.",
         href: "/learn/ml/gradient-descent",

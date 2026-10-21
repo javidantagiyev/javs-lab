@@ -1,0 +1,133 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import TypesMLLab from "@/components/labs/TypesMLLab";
+import TypesMLQuiz from "@/components/learning/TypesMLQuiz";
+
+## One Problem, Several Ways to Learn
+
+Imagine that you have collected thousands of photographs. You want a computer to find something useful in them. But *what information can you give it during training?*
+
+- If someone has already labeled every photograph, the algorithm can learn from **known answers**.
+- If no labels exist, the algorithm might still discover **patterns and groups**.
+- If only a few photographs are labeled, it can combine those labels with a larger pool of unlabeled examples.
+- It could even invent a learning task by **hiding part of each photograph**, then trying to recover it.
+- If instead your system must choose actions in a game, it can learn from **rewards and penalties**.
+
+These situations call for different machine learning strategies. The key idea is that a *learning paradigm* describes **how a system gains experience**, not merely what task it solves.
+
+## Five Learning Paradigms
+
+### 01 — Supervised Learning
+
+You provide examples together with their correct outcomes, called **labels** or **targets**. The learner finds patterns that connect the inputs with the outputs.
+
+Two familiar supervised tasks are **classification**, which predicts a category (spam/not spam), and **regression**, which predicts a numerical value (such as a house price). The labels may be produced by people, sensors, or other reliable processes.
+
+### 02 — Unsupervised Learning
+
+Here the system receives **unlabeled data** and seeks structure without being given the intended answers. It might form clusters of similar customers, compress a dataset into fewer dimensions, or spot unusual observations.
+
+A clustering algorithm does not necessarily discover the “correct” real-world categories: its groups are patterns implied by its inputs, assumptions, and method.
+
+### 03 — Semi-Supervised Learning
+
+Real labels can be expensive to collect. Semi-supervised systems exploit **a smaller labeled set together with a larger unlabeled set**. The unlabeled examples can reveal structure that helps the model use the scarce labels more effectively.
+
+A simple nearest-labeled-example classifier can illustrate what happens as more answers become available, although full semi-supervised algorithms also learn from the unlabeled structure itself.
+
+### 04 — Self-Supervised Learning
+
+In self-supervision, training targets are **generated automatically from the data**. Hide a word in a sentence and ask a model to predict it; conceal part of an image and ask for a reconstruction. The original, unmodified data supplies the answer.
+
+This is not the same as having no learning targets: the targets exist, but they are created programmatically rather than manually annotated.
+
+### 05 — Reinforcement Learning
+
+A learner called an **agent** interacts with an **environment**. It chooses an action, observes what happens, receives rewards or penalties, and gradually develops a **policy** for choosing actions.
+
+Unlike supervised learning, the agent usually does not receive the correct action at every step. It must explore and consider how actions influence future rewards.
+
+<LessonWorkbench lab={<TypesMLLab />} name="Five Types of Machine Learning">
+
+## Interactive Experiment: Change the Learning Signal
+
+The same broad question—**how can a machine improve with experience?**—has five different answers. Select each tab on the right. All experiments run inside your browser and use deliberately small datasets.
+
+### Experiment A — Learn from labels
+
+Choose **Supervised**. Click **Learn from labels**, then click an empty location in the plot. The model predicts class A or B using its nearest training examples.
+
+Try changing the number of neighbors from 1 to 7. Click a labeled dot to change its class and retrain. Notice that the prediction depends on both the **examples** and the **learning method**. This uses k-nearest neighbors, an **instance-based** classifier.
+
+### Experiment B — Find groups without labels
+
+Choose **Unsupervised**. The A/B labels are no longer supplied to the algorithm. Click **Move cluster centers** several times.
+
+The implementation performs one genuine k-means assignment-and-update step per click. The crosses move toward the averages of their assigned points. Click an empty part of the plot to add another unlabeled example and see how the clusters change.
+
+The two colors now represent **discovered groups**, not ground-truth classes.
+
+### Experiment C — Reveal scarce labels
+
+Choose **Semi-supervised**. Only two points are labeled initially. Click an unlabeled point and select **Reveal selected label**.
+
+Watch how the nearest-labeled baseline changes as more known labels become available. A genuine semi-supervised method would additionally exploit the distribution of the unlabeled points; this small demo focuses on the importance of **label scarcity**.
+
+### Experiment D — Make targets from raw data
+
+Choose **Self-supervised**. One value in a numerical sequence is hidden. Click **Train on generated masks**.
+
+The lab trains a tiny interpolation model using other masked positions and their original values as automatically created targets. Then it predicts the held-out value. Change which position is hidden and retrain. The model never needed a person to annotate the sequence.
+
+### Experiment E — Learn from rewards
+
+Choose **Reinforcement**. The agent starts in the top-left grid cell and seeks the green star while avoiding a hazard. Each ordinary move costs a small amount of reward.
+
+Click **Train 1** to see a tiny amount of experience, then **Train 100**. Arrows show the policy that the agent currently prefers. Q-learning updates the value of taking an action based on immediate and future reward.
+
+Because exploration and limited training matter, a few episodes do not guarantee an ideal route.
+
+## Other Ways to Classify ML Systems
+
+Supervision is only **one axis**. Géron also classifies machine learning systems according to **when they update** and **how they generalize**.
+
+### Batch versus online learning
+
+A **batch learning** system is trained on an available dataset and then deployed. When you want it to incorporate new information, you typically retrain it with updated data and deploy a new model.
+
+An **online learning** system updates incrementally, as one example or a small batch becomes available. “Online” describes *incremental updates*; the learning can also happen offline with streamed data.
+
+### Instance-based versus model-based learning
+
+**Instance-based methods** keep examples and generalize by comparing a new case with similar stored examples. Our supervised k-nearest-neighbors demo works this way.
+
+**Model-based methods** fit model parameters to examples and use the resulting model to predict. Linear regression, for example, learns coefficients of a line.
+
+These axes can be mixed. You can build a **supervised, online, model-based** learning system, or a **supervised, batch, instance-based** one. A real ML system is not limited to a single adjective.
+
+## Test Your Understanding
+
+Identify the type of supervision, the kind of information available, and the difference between supervision and the other learning axes.
+
+<TypesMLQuiz />
+
+## Summary and References
+
+- **Supervised:** training examples include known targets.
+- **Unsupervised:** learn patterns from unlabeled examples.
+- **Semi-supervised:** combine a small labeled dataset with a larger unlabeled one.
+- **Self-supervised:** construct training targets from the input data itself.
+- **Reinforcement:** learn actions from feedback in the form of rewards and penalties.
+- **Batch/online:** describes *when* learning updates occur.
+- **Instance/model-based:** describes *how* the system generalizes to new cases.
+
+**Primary reference:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed., O'Reilly (2022, copyright 2023), **Chapter 1 — “The Machine Learning Landscape,” pp. 9–26**. Specific sections: *Training Supervision* (pp. 10–17), *Batch Versus Online Learning* (pp. 17–20), and *Instance-Based Versus Model-Based Learning* (pp. 21–26).
+
+**Additional exercises:** [Géron's official Hands-On ML 3 notebooks](https://github.com/ageron/handson-ml3).
+
+All lesson prose, example datasets, interactive implementations, and illustrations were independently created for Jav's Lab. The textbook informs the concepts and organization; its published text and figures are not reproduced.
+
+**Previous:** <Link href="/learn/ml/introduction-to-machine-learning">01 — Introduction to Machine Learning</Link>  
+**Explore the course:** <Link href="/subjects/ml">Machine Learning modules ↗</Link>
+
+</LessonWorkbench>

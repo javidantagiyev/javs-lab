@@ -1,3 +1,4 @@
+import MLCourseCatalog from "@/components/learning/MLCourseCatalog";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -34,7 +35,9 @@ export default async function SubjectPage({ params }: { params: Promise<{ slug: 
           <div className="jav-catalog-art"><Image src={subject.artwork} alt="" fill sizes="300px" /></div>
         </div>
         <div className="jav-catalog-section-title"><span>LESSONS & EXPERIMENTS</span><span>{String(subject.lessons.length).padStart(2,"0")} AVAILABLE</span></div>
-        {subject.lessons.length > 0 ? (
+        {subject.slug === "ml" ? (
+          <MLCourseCatalog />
+        ) : subject.lessons.length > 0 ? (
           <div className="jav-catalog-lessons">
             {subject.lessons.map((lesson, index) => (
               <Link key={lesson.href} href={lesson.href} className="jav-catalog-lesson">

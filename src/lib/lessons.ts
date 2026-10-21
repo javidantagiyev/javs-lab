@@ -23,6 +23,14 @@ export const lessons: Lesson[] = [
   },
   {
     subject: "ml",
+    topic: "types-of-machine-learning",
+    title: "Types of Machine Learning",
+    description: "Compare five learning paradigms through interactive data, masking, clustering, and rewards.",
+    difficulty: "Beginner",
+    content: () => import("@/content/ml/types-of-machine-learning.mdx"),
+  },
+  {
+    subject: "ml",
     topic: "gradient-descent",
     title: "Gradient Descent",
     description: "Learn optimization through interactive experiments.",
