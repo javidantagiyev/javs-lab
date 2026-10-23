@@ -31,9 +31,25 @@ A sufficiently flexible model might memorize noise in the training data. Its tra
 
 However, after we repeatedly make decisions using validation results, those decisions themselves become tuned to that validation set. **That is why the final test set must remain separate.**
 
+## A Critical Distinction: Selecting vs. Evaluating
+
+**Parameter fitting** uses training data. **Hyperparameter selection** compares choices using validation data. **Final evaluation** estimates generalization with untouched test data.
+
+These stages should be treated as different activities, even if the same program performs all three.
+
+A subtle but important detail: **you can overfit the validation set too**. Suppose you try hundreds of model variants, choosing the one that happens to score best on a particular validation sample. Even without using validation examples to fit coefficients, your repeated choices can exploit random quirks in that sample. The final test helps detect overoptimistic selection.
+
+### What about cross-validation?
+
+With limited data, a single validation split can be noisy. **Cross-validation** repeats training and evaluation using different held-out folds, giving a more stable basis for model selection. Géron discusses this in Chapter 2 (pp. 88–97). We'll cover it more fully when we reach *Model Selection and Hyperparameter Tuning* in Module 4.
+
+For now, the three-way holdout is the simplest way to learn the separation of roles.
+
 <LessonWorkbench lab={<SplitEvaluationLab />} name="Training, Validation, and Testing — Split and Evaluate">
 
-## Interactive Experiment — Split. Select. Test.
+## Lab Guide
+
+**Training, Validation, and Testing — Split and Evaluate**
 
 The right panel contains **60 invented observations**. Each observation pairs a numerical input with a noisy target value. There is a nonlinear pattern underneath the noise, but you don't know its exact shape.
 
@@ -95,20 +111,6 @@ The lab reveals the purple test examples and computes the selected model's **tes
 
 Compare validation RMSE with test RMSE. They won't necessarily match: both are estimates based on finite samples. A single small synthetic experiment does not guarantee how a real-world model will perform.
 
-## A Critical Distinction: Selecting vs. Evaluating
-
-**Parameter fitting** uses training data. **Hyperparameter selection** compares choices using validation data. **Final evaluation** estimates generalization with untouched test data.
-
-These stages should be treated as different activities, even if the same program performs all three.
-
-A subtle but important detail: **you can overfit the validation set too**. Suppose you try hundreds of model variants, choosing the one that happens to score best on a particular validation sample. Even without using validation examples to fit coefficients, your repeated choices can exploit random quirks in that sample. The final test helps detect overoptimistic selection.
-
-### What about cross-validation?
-
-With limited data, a single validation split can be noisy. **Cross-validation** repeats training and evaluation using different held-out folds, giving a more stable basis for model selection. Géron discusses this in Chapter 2 (pp. 88–97). We'll cover it more fully when we reach *Model Selection and Hyperparameter Tuning* in Module 4.
-
-For now, the three-way holdout is the simplest way to learn the separation of roles.
-
 ## Guided Practice
 
 Use the experiment to investigate these questions before taking the quiz:
@@ -121,7 +123,9 @@ Use the experiment to investigate these questions before taking the quiz:
 
 **Experiment limitations:** The data is fictional, observations are independent by construction, and the models use straightforward polynomial least-squares regression. For real data involving people, patients, groups, locations, or time series, a random row split may be inappropriate. Group-aware or chronological splits may be necessary to prevent leakage. The lab is a teaching model, not a production evaluation pipeline.
 
-## Knowledge Check
+</LessonWorkbench>
+
+## Quiz
 
 <SplitEvaluationQuiz />
 
@@ -133,12 +137,10 @@ Use the experiment to investigate these questions before taking the quiz:
 - **Data leakage** invalidates an evaluation by allowing information from a holdout set to influence training inappropriately.
 - **Small error on training data** does not guarantee accurate predictions on unseen examples.
 
-### Academic References
+## References
 
 **Primary:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed. O'Reilly, 2022/2023. Chapter 1, **"Testing and Validating"**, pp. 34–36; Chapter 2, **"Create a Test Set"**, pp. 55–60, **"Better Evaluation Using Cross-Validation"**, pp. 88–90, and **"Fine-Tune Your Model"**, pp. 91–97.
 
 This lesson's explanations, synthetic observations, model-fitting code, and graphics are original Jav's Lab material developed with the book as an academic reference.
 
 Continue with **Lesson 06 — Underfitting and Overfitting** when it becomes available in Module 1.
-
-</LessonWorkbench>

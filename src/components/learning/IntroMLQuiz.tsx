@@ -1,7 +1,5 @@
 "use client";
-
-import { useState } from "react";
-import "../labs/intro-ml-lab.css";
+import SequentialQuiz from "./SequentialQuiz";
 
 const QUESTIONS = [
   {
@@ -31,40 +29,13 @@ const QUESTIONS = [
 ] as const;
 
 export default function IntroMLQuiz() {
-  const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const finished = index >= QUESTIONS.length;
-  const score = QUESTIONS.reduce((sum, q, i) => sum + Number(answers[i] === q.correct), 0);
-  const question = finished ? null : QUESTIONS[index];
-  const choice = answers[index];
-
-  return <section className="intro-ml-quiz" aria-label="Introduction to machine learning knowledge check">
-    <div className="intro-ml-quiz-head">
-      <span>SELF-CHECK / 04 QUESTIONS</span>
-      <span>{finished ? "COMPLETE" : `${String(index + 1).padStart(2, "0")} / 04`}</span>
-    </div>
-    {question ? <>
-      <h3>{question.prompt}</h3>
-      <div className="intro-ml-quiz-answers">
-        {question.options.map((option, optionIndex) => {
-          const chosen = choice === optionIndex;
-          const correct = question.correct === optionIndex;
-          return <button key={option} type="button" disabled={choice !== undefined}
-            className={choice !== undefined && correct ? "is-correct" : chosen ? "is-wrong" : ""}
-            onClick={() => setAnswers(previous => ({ ...previous, [index]: optionIndex }))}>
-            <span>{String.fromCharCode(65 + optionIndex)}</span>{option}
-          </button>;
-        })}
-      </div>
-      {choice !== undefined && <div className="intro-ml-quiz-feedback" role="status">
-        <strong>{choice === question.correct ? "Correct." : "Not quite."}</strong> {question.explanation}
-      </div>}
-      <button type="button" className="intro-ml-quiz-next" disabled={choice === undefined}
-        onClick={() => setIndex(old => old + 1)}>{index === QUESTIONS.length - 1 ? "See your score →" : "Next question →"}</button>
-    </> : <div className="intro-ml-quiz-complete">
-      <strong>{score} / {QUESTIONS.length}</strong>
-      <p>{score === QUESTIONS.length ? "Excellent — you have the foundations." : "Good practice. Review the lesson and try again to strengthen your understanding."}</p>
-      <button type="button" onClick={() => { setIndex(0); setAnswers({}); }}>↻ Try again</button>
-    </div>}
-  </section>;
+  return <SequentialQuiz
+    title="Spam Filter"
+    questions={QUESTIONS.map(question => ({
+      prompt: question.prompt,
+      options: question.options,
+      correct: question.correct,
+      explanation: question.explanation,
+    }))}
+  />;
 }

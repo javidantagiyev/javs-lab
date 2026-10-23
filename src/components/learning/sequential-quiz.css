@@ -1,0 +1,49 @@
+/* Jav's Lab: reusable quiz stage BELOW the interactive workbench. */
+.javs-sequential-quiz {
+  max-width: 890px;
+  margin: 24px 0 55px;
+  padding: clamp(19px,3vw,36px);
+  border: 1px solid #484033;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 100% 0%,rgba(177,132,67,.09),transparent 55%),#121411;
+  color: #eae1d4;
+  box-shadow: 0 20px 55px rgba(0,0,0,.14);
+}
+.jsq-topline {display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;color:#c8a97b;letter-spacing:.12em;font:10px/1.5 ui-monospace,Consolas,monospace;}
+.jsq-topline span:last-child {color:#a69b87;}
+.jsq-progress {height:4px;background:#343127;border-radius:99px;overflow:hidden;margin:18px 0 32px;}
+.jsq-progress > span {display:block;height:100%;background:linear-gradient(90deg,#8e6e43,#e1b983);border-radius:inherit;transition:width .2s ease-out;}
+.jsq-category {color:#b9a17e;font:11px/1.65 ui-monospace,Consolas,monospace;letter-spacing:.075em;margin:0 0 14px;}
+.jsq-category span {padding-inline:8px;color:#70695e;}
+.jsq-question h3,.jsq-complete h3 {margin:0 0 27px;color:#f0e7d8;font:400 clamp(23px,2.8vw,35px)/1.28 Georgia,"Times New Roman",serif;max-width:760px;}
+.jsq-question h3:focus,.jsq-complete h3:focus{outline:0;}
+.jsq-choices {display:grid;grid-template-columns:1fr;gap:10px;}
+.jsq-choice {appearance:none;display:flex;align-items:center;gap:14px;text-align:left;width:100%;min-height:54px;border-radius:9px;background:#1b1d19;border:1px solid #484236;color:#e0d6c6;padding:11px 15px;font:14px/1.55 ui-sans-serif,Arial,sans-serif;transition:background .15s,border-color .15s;cursor:pointer;}
+.jsq-choice:hover:not(:disabled){background:#26231c;border-color:#bc9562;}
+.jsq-choice:focus-visible,.jsq-next:focus-visible{outline:2px solid #e0b57d;outline-offset:3px;}
+.jsq-choice:disabled{cursor:default;opacity:1;}
+.jsq-letter{display:inline-flex;align-items:center;justify-content:center;flex:none;width:29px;height:29px;border:1px solid #675439;border-radius:6px;font:12px ui-monospace,Consolas,monospace;color:#d1ab78;}
+.jsq-choice.is-correct{background:#1c2820;border-color:#638a69;color:#dcf1dd;}
+.jsq-choice.is-correct .jsq-letter{border-color:#69946e;color:#a9d5ac;}
+.jsq-choice.is-incorrect{background:#32251f;border-color:#a67961;color:#f1d5c7;}
+.jsq-choice.is-incorrect .jsq-letter{border-color:#b9866e;color:#f1c1a9;}
+.jsq-choice.is-muted{opacity:.66;}
+.jsq-indicator{margin-left:auto;font-size:17px;font-weight:600;}
+.jsq-feedback{margin:22px 0 0;padding:15px 18px;border-left:2px solid #8aa990;border-radius:0 8px 8px 0;background:#1b241d;color:#c5d4c5;font-size:14px;line-height:1.75;}
+.jsq-feedback.is-wrong{background:#28221c;border-color:#d0a06e;color:#e5c8a7;}
+.jsq-feedback strong{display:block;color:#f3e9d7;margin-bottom:6px;}
+.jsq-feedback p{margin:0;}
+.jsq-actions{margin-top:25px;display:flex;gap:18px;align-items:center;justify-content:space-between;}
+.jsq-actions > span{font:11px/1.6 ui-sans-serif,Arial,sans-serif;color:#aca394;}
+.jsq-next{border:1px solid #dfb77e;border-radius:8px;background:#d7b17b;color:#1d180f;padding:12px 21px;font-weight:600;font-size:13px;white-space:nowrap;cursor:pointer;}
+.jsq-next:hover:not(:disabled){background:#f0ce9b;}
+.jsq-next:disabled{opacity:.4;cursor:not-allowed;}
+.jsq-complete{text-align:center;padding:24px 10px;}
+.jsq-complete h3 span{color:#ddb479;}
+.jsq-complete h3{margin:0 auto 15px;}
+.jsq-score{display:flex;align-items:baseline;justify-content:center;gap:12px;color:#c5aa80;margin:12px 0;}
+.jsq-score strong{font:400 clamp(65px,9vw,105px)/1 Georgia,serif;color:#e5be8d;}
+.jsq-score span{font:22px ui-monospace,Consolas,monospace;}
+.jsq-complete>p:not(.jsq-category){font-size:14px;color:#c7bcaa;margin:20px auto 26px;}
+@media(max-width:520px){.javs-sequential-quiz{padding:18px 14px;}.jsq-actions{flex-direction:column;align-items:stretch;}.jsq-next{width:100%;}.jsq-choice{font-size:13px;}}
+@media(prefers-reduced-motion:reduce){.jsq-progress>span,.jsq-choice{transition:none;}}

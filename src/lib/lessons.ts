@@ -71,6 +71,22 @@ export const lessons: Lesson[] = [
   },
   {
     subject: "ml",
+    topic: "linear-regression",
+    title: "Linear Regression",
+    description: "Fit a line to observations, explore residuals, and discover ordinary least squares.",
+    difficulty: "Beginner",
+    content: () => import("@/content/ml/linear-regression.mdx"),
+  },
+  {
+    subject: "ml",
+    topic: "loss-functions",
+    title: "Loss Functions (MAE, MSE, RMSE)",
+    description: "Compare absolute, squared, and root-mean-squared errors in an interactive prediction lab.",
+    difficulty: "Beginner",
+    content: () => import("@/content/ml/loss-functions.mdx"),
+  },
+  {
+    subject: "ml",
     topic: "gradient-descent",
     title: "Gradient Descent",
     description: "Learn optimization through interactive experiments.",

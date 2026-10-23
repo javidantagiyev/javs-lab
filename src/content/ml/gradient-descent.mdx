@@ -1,60 +1,228 @@
-import GradientDescentLab from "@/components/labs/GradientDescentLab";
+import Link from "next/link";
 import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import GradientDescentLab from "@/components/labs/GradientDescentLab";
+import GradientDescentQuiz from "@/components/learning/GradientDescentQuiz";
 
-## Introduction
+## Why Do Models Need Optimization?
 
-Gradient Descent is an optimization method used to **reduce the value of a function**. Imagine standing on a hill with your eyes closed: the slope beneath your feet tells you which direction leads downhill.
+In <Link href="/learn/ml/linear-regression">Linear Regression</Link>, we found the line that fits a set of observations. In <Link href="/learn/ml/loss-functions">Loss Functions</Link>, we learned how to measure a model's mistakes. But what if our model has so many parameters that we cannot simply calculate the best ones directly?
 
-Instead of guessing where the minimum lies, the algorithm uses that local slope to decide its next move. Repeating the process produces a sequence of points that may approach a minimum.
+**Gradient descent** provides an iterative answer: start with some parameter values, measure which direction makes the objective increase, and repeatedly move in the opposite direction. Rather than finding an optimum in one jump, we improve our current guess one step at a time.
 
-## The Mathematics
+Our interactive lab begins with a simpler problem: minimizing a **one-variable function** such as `x^2`. This gives us an intuitive picture of the update rule. Later, we connect the same mathematics to training models with many parameters.
 
-For a differentiable one-dimensional function, we update our current point using:
+**Primary reading:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, **3rd edition, Chapter 4**, “Gradient Descent” and its three variants (**pp. 138–149**). The explanations, calculations, exercises, and quiz here are original and follow the concepts in those sections.
+
+## Learning Objectives
+
+After this lesson, you should be able to:
+
+1. Explain the difference between a **model parameter**, a **cost function**, a **gradient**, and a **learning rate**.
+2. Calculate a gradient descent update by hand and predict the direction of the next step.
+3. Recognize slow convergence, oscillation, divergence, and stationary points.
+4. Explain the difference between **batch**, **stochastic**, and **mini-batch** gradient descent.
+5. Connect the one-dimensional lab to minimizing MSE in linear regression.
+
+## 1. The Objective: Make the Cost Smaller
+
+Suppose a regression model predicts a target using a line:
 
 $$
-x_{n+1} = x_n - \alpha f'(x_n)
+\hat y = wx+b
 $$
 
-Here, $\alpha$ is the **learning rate** (step size) and $f'(x_n)$ is the **gradient** at the current point.
+Here, $w$ (weight or slope) and $b$ (bias or intercept) are **parameters**. Training means choosing values that make the predictions close to the actual targets.
 
-A positive gradient means the curve rises as you move right, so the update moves left. A negative gradient moves you right. The learning rate controls how far you travel on each step.
+One possible cost is the **mean squared error**:
 
-<LessonWorkbench lab={<GradientDescentLab />} name="Gradient Descent">
+$$
+J(w,b)=\frac{1}{m}\sum_{i=1}^{m}\left(wx_i+b-y_i\right)^2
+$$
 
-## Interactive Experiment
+The training data stay fixed while the parameters change. A lower value of $J$ means smaller *average squared training error*.
 
-The plot on the right is your live optimization playground. Try changing a value here, then observe how the curve and iterations respond.
+**Important distinction:** in the lab, we optimize a generic function $f(x)$ and the horizontal coordinate is the variable being optimized. In regression, the inputs $x_i$ are observations; gradient descent instead changes the **parameters** $w$ and $b$. The update principle is identical, but the meaning of the variables is different.
 
-### 01 — Choose a function
+## 2. The Derivative Tells Us Which Way Is Uphill
 
-Start with `x^2`, which has a minimum at zero. Try **Double well** or **Wave** from the presets to explore more interesting shapes.
+For a one-variable function $f(x)$, the derivative $f'(x)$ describes its local slope:
 
-### 02 — Set the starting point
+- **Positive derivative:** the function rises as $x$ increases, so a small move **left** should decrease it.
+- **Negative derivative:** the function falls as $x$ increases, so a small move **right** should decrease it.
+- **Zero derivative:** the location is a **stationary point**. It may be a minimum, a maximum, or a flatter point of neither type.
 
-Change **Starting X**, or drag the highlighted point on the graph. This is where the algorithm begins.
+Gradient descent makes this decision automatically:
 
-### 03 — Adjust the learning rate
+$$
+\boxed{x_{k+1}=x_k-\alpha f'(x_k)}
+$$
 
-A small learning rate takes cautious steps. A large one can move faster, but it may jump past the minimum or even diverge.
+Here $k$ is the iteration number and $\alpha>0$ is the **learning rate**. We subtract the derivative because it points in the local direction of increase.
 
-### 04 — Iterate
+In a model with many parameters, a **gradient** is a vector of partial derivatives—one slope for each parameter. The corresponding update becomes:
 
-Press **Next iteration** repeatedly. Watch how the current coordinate, loss, and gradient change. Use **Undo** or **Reset steps** to compare different choices.
+$$
+\boxed{\boldsymbol\theta_{k+1}=\boldsymbol\theta_k-\alpha\nabla J(\boldsymbol\theta_k)}
+$$
 
-## Practice
+The lab's single derivative $f'(x)$ is the one-dimensional version of this gradient.
 
-Use the experiment to investigate these questions:
+## 3. Calculate Three Steps by Hand
 
-1. What happens when you set a learning rate that is too large?
-2. Can you find a starting point with a zero gradient?
-3. Does a zero gradient always mean you've found a minimum?
+Start with the simple bowl-shaped function:
 
-Try the **Double well** preset. Observe how the starting point can determine which local minimum you approach.
+$$
+f(x)=x^2,\qquad f'(x)=2x
+$$
 
-## Summary
+Choose **Starting X = 3** and **Learning rate $\alpha = 0.20$**. Each step is:
 
-Gradient Descent moves **against the local gradient**. The learning rate determines the size of each move, while the shape of the function and the starting point influence where you end up.
+$$
+x_{k+1}=x_k-0.20(2x_k)=0.60x_k
+$$
 
-The key idea: *the algorithm doesn't know the entire landscape—it responds to the slope where it is now.*
+| Iteration | Current $x$ | Gradient $2x$ | Cost $x^2$ |
+| --- | ---: | ---: | ---: |
+| 0 | 3.000 | 6.000 | 9.000 |
+| 1 | 1.800 | 3.600 | 3.240 |
+| 2 | 1.080 | 2.160 | 1.1664 |
+| 3 | 0.648 | 1.296 | 0.4199 |
+
+The objective decreases because the updates move toward the minimum at $x=0$. The steps themselves shrink as the gradient becomes smaller.
+
+## 4. The Learning Rate Can Make or Break Training
+
+The learning rate is a **hyperparameter**: we choose it; the optimization procedure does not normally learn it as a model weight.
+
+For our specific example $f(x)=x^2$:
+
+$$
+x_{k+1}=(1-2\alpha)x_k
+$$
+
+This recurrence gives us a particularly clear experiment:
+
+| Learning rate | What happens from $x_0\ne0$? |
+| --- | --- |
+| $\alpha=0.05$ | Slow but steady movement toward zero |
+| $\alpha=0.20$ | Faster movement toward zero |
+| $\alpha=0.75$ | Alternates sides, but its distance to zero decreases |
+| $\alpha=1.00$ | Alternates between $x_0$ and $-x_0$; **does not converge** |
+| $\alpha=1.20$ | Repeatedly overshoots with growing magnitude; **diverges** |
+
+For this *particular* quadratic and a fixed positive learning rate, $0<\alpha<1$ produces convergence. **That numerical range is not a universal rule**: other functions and models have different stable learning-rate ranges.
+
+Géron emphasizes the same practical trade-off in Chapter 4: a tiny learning rate wastes iterations, while an excessively large one can send the optimizer away from the minimum.
+
+## 5. Stationary Points and the Shape of the Landscape
+
+For a smooth convex cost function, an appropriately chosen learning rate can lead gradient descent toward a global minimum. **Ordinary least-squares regression has a convex MSE objective in its parameters**, which is an important reason its optimization is manageable. Depending on the data, the optimum need not be unique.
+
+But not all optimization landscapes are convex. Some have multiple minima, maxima, flat regions, or steep walls. Gradient descent can settle in different places depending on where it starts.
+
+Consider the **double-well** objective:
+
+$$
+f(x)=x^4-3x^2,\qquad f'(x)=4x^3-6x
+$$
+
+This example has two global minima at $x=\pm\sqrt{3/2}\approx\pm1.225$. At $x=0$, the gradient is also zero—but $x=0$ is a **local maximum**, not a minimum.
+
+Starting points matter: a small or zero gradient is not, by itself, a guarantee of a good optimum.
+
+## 6. How Gradient Descent Trains Linear Regression
+
+Return to $J(w,b)$ from Section 1. Instead of one derivative, the optimizer needs a partial derivative for each parameter:
+
+$$
+\frac{\partial J}{\partial w}=\frac{2}{m}\sum_{i=1}^{m}(wx_i+b-y_i)x_i
+$$
+
+$$
+\frac{\partial J}{\partial b}=\frac{2}{m}\sum_{i=1}^{m}(wx_i+b-y_i)
+$$
+
+Now change *both* parameters at each iteration:
+
+$$
+w_{k+1}=w_k-\alpha\frac{\partial J}{\partial w},\qquad
+b_{k+1}=b_k-\alpha\frac{\partial J}{\partial b}
+$$
+
+A single point on the lab's graph corresponds to **one value of $x$**. For real linear regression, a point in **parameter space** corresponds to the pair $(w,b)$. We are optimizing the position of the model in that space, not moving the input observations around.
+
+A simplified training loop looks like this:
+
+```python
+# X is an m-by-2 matrix: a column of ones and a feature column.
+# y contains m observed targets; theta holds [bias, weight].
+for epoch in range(1000):
+    gradient = (2 / len(X)) * X.T @ (X @ theta - y)
+    theta = theta - learning_rate * gradient
+```
+
+This is **batch gradient descent** for MSE: every iteration uses the entire training set. The matrix expression is the vectorized version of the two derivatives above. The snippet assumes NumPy arrays with compatible shapes; it is an illustration, not code that runs in the browser lab.
+
+**Connection to Lesson 07:** when features have very different scales, the cost landscape can stretch into a long, narrow valley. Géron explains why comparable feature scales often make gradient descent much faster. Standardization can help.
+
+## 7. Batch vs. Stochastic vs. Mini-Batch
+
+All three methods use the same *idea*—move against an estimated gradient. They differ in how many training examples contribute to each update.
+
+| Method | Examples used per update | Typical behavior |
+| --- | --- | --- |
+| **Batch GD** | All training examples | Smooth, repeatable updates, but costly on huge datasets |
+| **Stochastic GD (SGD)** | One randomly selected example | Cheap, noisy updates that can move around the optimum |
+| **Mini-batch GD** | A small group of examples | Middle ground; efficient matrix operations and less noise than single-example SGD |
+
+An **epoch** typically means processing the entire training set once. Batch GD usually makes **one update per epoch**; SGD and mini-batch GD can make **many updates per epoch**. Actual schedules and sampling schemes vary.
+
+Géron's Chapter 4 discusses learning schedules for SGD: gradually reducing the learning rate can help the optimizer settle instead of continuing to bounce around an optimum.
+
+**Lab limitation:** our preserved interactive lab performs deterministic updates for a chosen **one-dimensional function**. It **does not simulate random training samples or mini-batches**. This section connects the lab's mathematical idea to practical ML training; it does not claim that those variants are selectable in the existing lab.
+
+## 8. When Should Training Stop?
+
+In practice, optimizers need a stopping rule. Common possibilities include reaching a maximum number of iterations, observing only a very small change in cost, or detecting a sufficiently small gradient. With nonconvex functions, a tiny gradient might also mean a saddle or local maximum, so stopping conditions require context.
+
+To check whether a trained model **generalizes**, evaluate it on validation data, as in <Link href="/learn/ml/training-validation-and-testing">Lesson 05 — Training, Validation, and Testing</Link>. A low *training* cost does not automatically imply a low *validation* error.
+
+<LessonWorkbench lab={<GradientDescentLab />} name="Gradient Descent — Optimization Playground">
+
+## Lab Guide
+
+Use the original Gradient Descent playground while applying the concepts explained above.
+
+1. **Verify an update.** Choose `x^2`, start at `3`, set the learning rate to `0.20`, and step three times. Compare each result with the worked example.
+2. **Change the learning rate.** Try `0.05`, `0.20`, `0.75`, `1.00`, and `1.20`. Which settings converge, oscillate, or diverge?
+3. **Change the starting point.** Select *Double well* and compare runs starting at `-0.5`, `0`, and `0.5`. Do you reach the same outcome?
+4. **Read the derivative.** Enable the tangent display. Predict the next direction from the sign of the slope before taking a step.
+5. **Explore nonconvex optimization.** Use *Wave*, choose a small learning rate, and compare runs from different starting points.
+6. **Define your own function.** Enter `x^2 + 2*x + 3`. Predict the location of its minimum before using the optimizer.
+
+**Experiment controls:** *Undo* revisits the previous update; *Reset* lets you start a fresh run.
 
 </LessonWorkbench>
+
+## Quiz
+
+Test your understanding of the update rule, derivatives, learning rates, stationary points, and gradient-descent variants.
+
+<GradientDescentQuiz />
+
+## Key Takeaways
+
+- Gradient descent adjusts **parameters** to reduce an objective function.
+- Each update moves **opposite to the gradient**; the learning rate determines step size.
+- An overly large learning rate may cause **oscillation or divergence** rather than convergence.
+- A zero gradient identifies a **stationary point**; it does not guarantee a global minimum.
+- **Batch**, **stochastic**, and **mini-batch** gradient descent differ in the examples used for each update.
+- **Feature scaling** and validation-based model assessment are important when optimizing real ML models.
+
+## References
+
+**Primary textbook:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd edition, O’Reilly Media (2022/2023), **Chapter 4, pp. 138–149** — Gradient Descent, Batch Gradient Descent, Stochastic Gradient Descent, and Mini-Batch Gradient Descent.
+
+**Companion notebooks:** [Hands-On ML 3, official GitHub repository](https://github.com/ageron/handson-ml3).
+
+*Jav’s Lab lesson, examples, and browser experiment are original educational material; no copyrighted textbook figures or paragraphs are reproduced.*

@@ -1,7 +1,5 @@
 "use client";
-
-import { useState } from "react";
-import "./preprocessing-quiz.css";
+import SequentialQuiz from "./SequentialQuiz";
 
 type Question = { prompt: string; choices: [string,string,string]; correct: number; why: string };
 const QUESTIONS: Question[] = [
@@ -11,21 +9,15 @@ const QUESTIONS: Question[] = [
   {prompt:"After training, a new neighborhood appears that was not observed during fit. With handle_unknown='ignore', what happens?",choices:["The model learns a new coefficient automatically","Known neighborhood indicator columns are all zero for that record","The house is automatically removed"],correct:1,why:"An unknown category can be represented using all zeros across the learned one-hot columns. This preserves the fitted feature schema, though it may reduce predictive quality."},
   {prompt:"You switch the lab from standard scaling to no scaling and 3-NN predictions change. Why?",choices:["Feature units influence Euclidean distances","The target prices were secretly retrained","The validation labels changed"],correct:0,why:"A feature with numerically larger values can dominate distance calculations when features are not scaled. The nearest-neighbor model is sensitive to that geometry."},
 ];
+
 export default function PreprocessingQuiz() {
-  const [answers,setAnswers]=useState<(number|null)[]>(()=>QUESTIONS.map(()=>null));
-  const [submitted,setSubmitted]=useState(false);
-  const ready=answers.every(answer=>answer!==null);
-  const score=answers.reduce<number>((sum,answer,i)=>sum+Number(answer===QUESTIONS[i].correct),0);
-  return <section className="jml7q" aria-label="Data preprocessing knowledge check">
-    <div className="jml7q-header"><span>LESSON 007 / KNOWLEDGE CHECK</span><span>{submitted?`${score} / ${QUESTIONS.length} CORRECT`:`${answers.filter(a=>a!==null).length} / ${QUESTIONS.length} ANSWERED`}</span></div>
-    {QUESTIONS.map((question,index)=><fieldset className="jml7q-question" key={question.prompt}>
-      <legend><span>{String(index+1).padStart(2,"0")}</span>{question.prompt}</legend>
-      <div className="jml7q-choices">{question.choices.map((choice,choiceIndex)=><label key={choice} className={`${answers[index]===choiceIndex?"chosen":""} ${submitted&&choiceIndex===question.correct?"correct":""} ${submitted&&answers[index]===choiceIndex&&choiceIndex!==question.correct?"wrong":""}`}>
-        <input type="radio" name={`jml7q-${index}`} checked={answers[index]===choiceIndex} disabled={submitted} onChange={()=>setAnswers(old=>old.map((a,i)=>i===index?choiceIndex:a))}/>{choice}
-      </label>)}</div>
-      {submitted&&<p className="jml7q-reason"><strong>{answers[index]===question.correct?"Correct.":"Review."}</strong> {question.why}</p>}
-    </fieldset>)}
-    <div className="jml7q-actions"><button type="button" onClick={()=>{setAnswers(QUESTIONS.map(()=>null));setSubmitted(false);}}>Try again ↻</button><button type="button" disabled={!ready||submitted} onClick={()=>setSubmitted(true)}>{submitted?"Completed":"Check answers →"}</button></div>
-    {submitted&&<p className="jml7q-score" role="status">{score} of {QUESTIONS.length} correct. {score===QUESTIONS.length?"You've mastered the main preprocessing decisions.":"Use the explanations and try again when you're ready."}</p>}
-  </section>;
+  return <SequentialQuiz
+    title="Data Preprocessing"
+    questions={QUESTIONS.map(question => ({
+      prompt: question.prompt,
+      options: question.choices,
+      correct: question.correct,
+      explanation: question.why,
+    }))}
+  />;
 }

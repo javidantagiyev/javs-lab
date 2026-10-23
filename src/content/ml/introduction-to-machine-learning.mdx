@@ -36,38 +36,6 @@ Most beginner ML systems can be understood through four steps:
 
 A convenient way to describe learning comes from the task–experience–performance framework in Géron's Chapter 1. For our spam filter, the **task** is classifying emails, **experience** is labeled training emails, and **performance** could be accuracy on a separate test set.
 
-<LessonWorkbench lab={<IntroMLSpamLab />} name="Spam Filter — Introduction to Machine Learning">
-
-## Interactive Experiment
-
-On the right is a small, real text classifier. Your job is to teach it which emails are spam and which are normal. It is a deliberately tiny learning system, not a production-quality spam filter.
-
-### 01 — Inspect the training examples
-
-Each email has a **label**. Click a label to change it, or add your own example. The model does not yet know which words matter; your examples provide that evidence.
-
-### 02 — Train the model
-
-Click **Train model**. The lab fits a simple *multinomial Naive Bayes* classifier: it counts words associated with each category and combines their likelihoods to score new emails.
-
-You do not need to memorize the algorithm yet. The important observation is that the program **learns its word associations from the labels** instead of using a hand-written list of spam keywords.
-
-### 03 — Test an unseen email
-
-Edit the message or choose a preset. Compare the learned model with the **fixed rule** on the right. The fixed rule only checks whether an email contains “free” or “win”; it never improves through training.
-
-The probability bar is a toy model's numerical score, not a guarantee that an email really is spam.
-
-### 04 — Change the evidence
-
-Relabel several training emails incorrectly, then retrain. Does the model become less reliable? Restore the examples with **Reset data** to compare fairly.
-
-### 05 — Inspect generalization
-
-The lab evaluates both approaches on **four fixed hold-out emails** that were not included during training. That separation matters: scoring a model using its training examples would tell us little about its ability to handle unseen email.
-
-The four examples make evaluation visible, but they are far too few to establish reliable real-world performance.
-
 ## Types of Learning
 
 Géron introduces several ways to categorize ML systems. The first question is **what kind of feedback the model receives**.
@@ -100,14 +68,50 @@ To evaluate fairly, distinguish three roles:
 
 One popular classification metric is *accuracy*: the fraction of examples predicted correctly. It is easy to understand, but it is not enough for every problem. For example, when fraudulent transactions are very rare, a detector can have deceptively high accuracy while missing the important cases.
 
-### Try this in the lab
+<LessonWorkbench lab={<IntroMLSpamLab />} name="Spam Filter — Introduction to Machine Learning">
+
+## Lab Guide
+
+**Spam Filter — Introduction to Machine Learning**
+
+On the right is a small, real text classifier. Your job is to teach it which emails are spam and which are normal. It is a deliberately tiny learning system, not a production-quality spam filter.
+
+### 01 — Inspect the training examples
+
+Each email has a **label**. Click a label to change it, or add your own example. The model does not yet know which words matter; your examples provide that evidence.
+
+### 02 — Train the model
+
+Click **Train model**. The lab fits a simple *multinomial Naive Bayes* classifier: it counts words associated with each category and combines their likelihoods to score new emails.
+
+You do not need to memorize the algorithm yet. The important observation is that the program **learns its word associations from the labels** instead of using a hand-written list of spam keywords.
+
+### 03 — Test an unseen email
+
+Edit the message or choose a preset. Compare the learned model with the **fixed rule** on the right. The fixed rule only checks whether an email contains “free” or “win”; it never improves through training.
+
+The probability bar is a toy model's numerical score, not a guarantee that an email really is spam.
+
+### 04 — Change the evidence
+
+Relabel several training emails incorrectly, then retrain. Does the model become less reliable? Restore the examples with **Reset data** to compare fairly.
+
+### 05 — Inspect generalization
+
+The lab evaluates both approaches on **four fixed hold-out emails** that were not included during training. That separation matters: scoring a model using its training examples would tell us little about its ability to handle unseen email.
+
+The four examples make evaluation visible, but they are far too few to establish reliable real-world performance.
+
+### Additional Lab Challenge
 
 1. Train on the original labels and record the hold-out accuracy.
 2. Flip two labels from spam to normal, retrain, and compare.
 3. Add two correctly labeled examples containing a new distinctive word. Test a message using that word.
 4. Ask yourself: why should you avoid repeatedly modifying a model solely to improve its score on the same tiny test set?
 
-## Knowledge Check
+</LessonWorkbench>
+
+## Quiz
 
 Before moving on, test whether you can identify learning from data, overfitting, and fair evaluation.
 
@@ -121,12 +125,10 @@ The central goal is not to memorize the training data. It is to **learn patterns
 
 Next, the course will explore the major types of ML in more depth. To explore how models can improve their parameters step by step, you can also open our existing <Link href="/learn/ml/gradient-descent">Gradient Descent experiment</Link>.
 
-## References and Further Reading
+## References
 
 **Primary textbook:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed., O'Reilly Media, 2022 (copyright 2023). **Chapter 1, “The Machine Learning Landscape,” pp. 3–38.** Especially: *What Is Machine Learning?* (p. 4), *Why Use Machine Learning?* (pp. 5–7), *Types of Machine Learning Systems* (pp. 9–26), *Main Challenges* (pp. 27–33), and *Testing and Validating* (pp. 34–36).
 
 **Companion exercises and notebooks:** [Aurélien Géron's official Hands-On ML 3 repository](https://github.com/ageron/handson-ml3). Read the Chapter 1 notebook for further examples and exercises.
 
 *This lesson, its text, its classifier, and its interactions were created for Jav's Lab. The reference book supplies the academic foundations; its figures and paragraphs are not reproduced here.*
-
-</LessonWorkbench>

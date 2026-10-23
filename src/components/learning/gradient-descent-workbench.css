@@ -1,0 +1,43 @@
+/* Only Lesson 10. Uses the existing Jav's Lab workbench layout and color system. */
+.jml10-workbench { margin-top: 29px; }
+.jml10-workbench .javs-workbench-grid { grid-template-columns: minmax(330px,.83fr) minmax(0,1.47fr); }
+.jml10-workbench .javs-workbench-reading-inner { padding: 24px clamp(16px,2vw,31px) 35px; }
+.jml10-workbench .javs-pane-eyebrow { margin-bottom: 17px; }
+.jml10-tablist { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:5px; padding:4px; background:#0c0d0b; border:1px solid #373127; border-radius:9px; margin-bottom:25px; }
+.jml10-tab { min-width:0; border:1px solid transparent; background:transparent; color:#9f9789; padding:10px 5px; border-radius:6px; font: 500 11px/1.5 ui-sans-serif,Arial,sans-serif; cursor:pointer; white-space:nowrap; }
+.jml10-tab span { font: 9px ui-monospace,Consolas,monospace; color:#8f7a59; margin-right:3px; }
+.jml10-tab:hover { color:#e3cfad; background:#211e17; }
+.jml10-tab.is-active { background:#2a241a; color:#ebd3ad; border-color:#6e5737; }
+.jml10-tab:focus-visible { outline:2px solid #d5aa73; outline-offset:2px; }
+.jml10-panel[hidden] { display:none !important; }
+.jml10-panel-title { color:#f1e7d8; font:400 clamp(25px,2.3vw,34px)/1.2 Georgia,serif; margin:0 0 14px; }
+.jml10-accent { color:#d7b582; }
+.jml10-intro { font-size:13px; color:#aea79b; line-height:1.75; margin:0 0 21px; }
+.jml10-missions { counter-reset: mission; margin:0; padding:0; list-style:none; }
+.jml10-missions li { position:relative; padding:12px 0 15px 39px; border-top:1px solid #302d27; }
+.jml10-missions li::before { counter-increment:mission; content:counter(mission,decimal-leading-zero); position:absolute; top:14px; left:0; color:#c7a370; font:11px ui-monospace,Consolas,monospace; }
+.jml10-missions strong { display:block; font-size:13px; font-weight:600; color:#e9dfcf; margin-bottom:4px; }
+.jml10-missions li span { display:block; font-size:12px; line-height:1.72; color:#b0aa9e; }
+.jml10-missions code { color:#e2bc83; background:#29241c; padding:1px 4px; border-radius:4px; font:11px ui-monospace,Consolas,monospace; }
+.jml10-help { margin:22px 0 0; font-size:12px; color:#afa08d; line-height:1.7; padding:12px 14px; border-left:2px solid #a78350; background:#1c1b16; }
+.jml10-help strong {color:#ead4b0;}
+.jml10-takeaways { padding-left:19px; margin:0 0 30px; color:#c5bcad; line-height:1.8; font-size:13px; }
+.jml10-takeaways li { padding:0 0 11px 3px; }
+.jml10-takeaways li::marker { color:#c6a575; }
+.jml10-takeaways strong { color:#e7d4b4; }
+.jml10-reference { padding:18px 17px; background:#1d1b16; border:1px solid #443929; border-radius:9px; }
+.jml10-reference h4 { margin:0 0 12px; color:#dfbd8c; font:600 11px ui-monospace,Consolas,monospace; letter-spacing:.06em; text-transform:uppercase; }
+.jml10-reference p { margin:0 0 12px; color:#c5b8a4; font:12px/1.75 ui-sans-serif,Arial,sans-serif; }
+.jml10-reference p:last-child {margin-bottom:0;}
+.jml10-reference-note { color:#938a7d !important; font-size:11px !important; }
+.jml10-workbench .jml10q { margin-top:0; }
+@media (max-width:1023px) {
+ .jml10-workbench .javs-workbench-grid {display:flex;flex-direction:column;height:auto;min-height:0;}
+ .jml10-workbench .javs-workbench-reading {overflow:visible;border-right:0;border-bottom:1px solid #3c352a;}
+ .jml10-workbench .javs-workbench-lab {overflow:visible;}
+}
+@media (max-width:520px) {
+ .jml10-workbench .javs-workbench-reading-inner {padding:18px 14px 25px;}
+ .jml10-tab {font-size:10px;}
+ .jml10-tab span {display:none;}
+}

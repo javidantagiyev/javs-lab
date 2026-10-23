@@ -48,9 +48,41 @@ $$
 
 We square each prediction error, then average the squares. Larger mistakes count more strongly. In the experiment, we'll also display **root mean squared error (RMSE)**, which is easier to interpret because it is measured in *score points* rather than squared points.
 
+## Understanding the Training Update
+
+A model's predictions depend on its parameters. Training looks for changes that reduce a cost function. In gradient descent, a parameter is moved in the direction *opposite* the gradient of that cost:
+
+$$
+\theta_{\mathrm{new}} = \theta_{\mathrm{old}} - \alpha \frac{\partial J}{\partial \theta}
+$$
+
+Here **θ** represents a parameter, **J** represents the loss, and **α** is the learning rate. In this line-fitting experiment, both the intercept and slope receive updates. The gradient tells us how a small parameter change would affect the loss near the current model.
+
+You don't need to compute these derivatives by hand yet. For now, focus on the **feedback loop**: the model makes errors; the training algorithm uses those errors to improve the parameters. We'll derive and visualize gradient descent in detail in <Link href="/learn/ml/gradient-descent">Lesson 10 — Gradient Descent</Link>.
+
+### Model parameters versus hyperparameters
+
+| Term | In the experiment | Who changes it? |
+| --- | --- | --- |
+| **Feature** | Study hours | Comes from each input example |
+| **Target** | Practice score | Comes from the recorded training data |
+| **Model parameter** | Intercept, slope | You manually, or the training algorithm |
+| **Hyperparameter** | Learning rate | You choose before running updates |
+| **Loss** | Mean squared error | Computed from predictions and known targets |
+
+## Generalization Is the Real Goal
+
+A model can fit the training points very well without becoming universally reliable. Real datasets may contain noise, unrepresentative cases, or relationships that a straight line cannot capture. And the training process sees only a limited slice of the world.
+
+This is why we care about **generalization**: making reasonable predictions for *new cases*, not merely producing small errors on examples already used to fit the model. Géron emphasizes this distinction in Chapter 1, particularly *Main Challenges of Machine Learning* (pp. 27–34).
+
+In our lab, the teal points make that distinction visible. A good fit to the eight gold points is encouraging, but it is not the same as reliable performance everywhere.
+
 <LessonWorkbench lab={<ModelLearningLab />} name="How Models Learn — Train a Prediction Line">
 
-## Interactive Experiment — Train the Line
+## Lab Guide
+
+**How Models Learn — Train a Prediction Line**
 
 The right panel shows a **real training loop implemented in JavaScript**, not a pre-recorded animation. There are eight gold training observations, a gold prediction line, and three teal-outlined **unseen examples** that the training algorithm never uses.
 
@@ -88,36 +120,6 @@ Turn **Show unseen examples** on or off. Those three examples were not used duri
 
 We'll explore the proper roles of **training**, **validation**, and **test** datasets in <Link href="/subjects/ml">Lesson 05</Link>.
 
-## Understanding the Training Update
-
-A model's predictions depend on its parameters. Training looks for changes that reduce a cost function. In gradient descent, a parameter is moved in the direction *opposite* the gradient of that cost:
-
-$$
-\theta_{\mathrm{new}} = \theta_{\mathrm{old}} - \alpha \frac{\partial J}{\partial \theta}
-$$
-
-Here **θ** represents a parameter, **J** represents the loss, and **α** is the learning rate. In this line-fitting experiment, both the intercept and slope receive updates. The gradient tells us how a small parameter change would affect the loss near the current model.
-
-You don't need to compute these derivatives by hand yet. For now, focus on the **feedback loop**: the model makes errors; the training algorithm uses those errors to improve the parameters. We'll derive and visualize gradient descent in detail in <Link href="/learn/ml/gradient-descent">Lesson 10 — Gradient Descent</Link>.
-
-### Model parameters versus hyperparameters
-
-| Term | In the experiment | Who changes it? |
-| --- | --- | --- |
-| **Feature** | Study hours | Comes from each input example |
-| **Target** | Practice score | Comes from the recorded training data |
-| **Model parameter** | Intercept, slope | You manually, or the training algorithm |
-| **Hyperparameter** | Learning rate | You choose before running updates |
-| **Loss** | Mean squared error | Computed from predictions and known targets |
-
-## Generalization Is the Real Goal
-
-A model can fit the training points very well without becoming universally reliable. Real datasets may contain noise, unrepresentative cases, or relationships that a straight line cannot capture. And the training process sees only a limited slice of the world.
-
-This is why we care about **generalization**: making reasonable predictions for *new cases*, not merely producing small errors on examples already used to fit the model. Géron emphasizes this distinction in Chapter 1, particularly *Main Challenges of Machine Learning* (pp. 27–34).
-
-In our lab, the teal points make that distinction visible. A good fit to the eight gold points is encouraging, but it is not the same as reliable performance everywhere.
-
 ## Guided Practice
 
 Without looking at the answers, use the lab to investigate:
@@ -130,17 +132,21 @@ Without looking at the answers, use the lab to investigate:
 
 **A note on limitations:** The lab fits just one straight-line model to a tiny, invented dataset. Real model families can have thousands or billions of parameters; some can model nonlinear patterns. Still, the core ideas—examples, predictions, loss, and parameter updates—carry across much of supervised machine learning.
 
-## Knowledge Check
+</LessonWorkbench>
+
+## Quiz
 
 <ModelLearningQuiz />
 
-## Summary and References
+## Key Takeaways
 
 - **Training** adjusts model parameters using examples, a chosen loss, and a learning algorithm.
 - **Predictions** come from applying the learned model to input features.
 - **Model parameters** are learned; **hyperparameters** guide how learning happens.
 - **Smaller training loss** is not a guarantee of generalization.
 - **Gradient descent** is one way—not the only way—to optimize model parameters.
+
+## References
 
 **Primary reference:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed. (O'Reilly, 2022/2023). **Chapter 1**, *Instance-Based Versus Model-Based Learning* (pp. 21–26), *Main Challenges of Machine Learning* (pp. 27–34); **Chapter 4**, *Linear Regression* (pp. 132–137) and *Gradient Descent* (pp. 138–148).
 
@@ -149,5 +155,3 @@ Without looking at the answers, use the lab to investigate:
 **Previous:** <Link href="/learn/ml/data-features-and-labels">03 — Data, Features, and Labels</Link>  
 **Course:** <Link href="/subjects/ml">Machine Learning modules ↗</Link>  
 **Next:** 05 — Training, Validation, and Testing *(planned)*
-
-</LessonWorkbench>

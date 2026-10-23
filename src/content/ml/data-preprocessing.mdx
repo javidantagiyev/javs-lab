@@ -102,9 +102,40 @@ Do **not** compute the imputer median, category vocabulary, or scaler statistics
 
 There is a second separation to protect: the **target price is not an input feature**. The model learns from input features paired with target labels during training; it does not get to read the true price when predicting a new example.
 
+## 5. Pipelines Make Preprocessing Repeatable
+
+When a project has several features, repeated manual steps are easy to apply incorrectly. Géron shows how to create **pipelines** in Scikit-Learn, including separate numerical and categorical branches.
+
+This compact example demonstrates the same idea in Python. It is **illustrative code**, not a dependency of the browser lab:
+
+```python
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+numeric = make_pipeline(
+    SimpleImputer(strategy="median"),
+    StandardScaler(),
+)
+
+preprocess = ColumnTransformer([
+    ("numeric", numeric, ["area", "age"]),
+    ("neighborhood", OneHotEncoder(handle_unknown="ignore"), ["zone"]),
+])
+
+# The target column, price, is separate from X.
+X_train_ready = preprocess.fit_transform(X_train)
+X_valid_ready = preprocess.transform(X_valid)  # no fit on validation
+```
+
+A production pipeline also needs careful treatment of dataset versioning, unexpected column types, outliers, and drift. A fitted transformer should be deployed together with the model that expects its feature representation.
+
 <LessonWorkbench lab={<PreprocessingLab />} name="Data Preprocessing — From Raw Data to Model-Ready Features">
 
-## Interactive Experiment — The Data Preparation Studio
+## Lab Guide
+
+**Data Preprocessing — From Raw Data to Model-Ready Features**
 
 The right panel holds an original **synthetic housing dataset**. It has 10 labeled training examples and 4 labeled validation examples. Each row contains area, age, neighborhood, and price. Price is shown for teaching and evaluation, but is not passed into the preprocessing feature vectors.
 
@@ -162,36 +193,9 @@ Inspect the validation prediction table. Choose a validation record and read its
 
 **Think:** A price prediction changes because you altered the training features. Does that mean the true price changed? No. This is a reminder that **features, labels, and predictions are different things**.
 
-## 5. Pipelines Make Preprocessing Repeatable
+</LessonWorkbench>
 
-When a project has several features, repeated manual steps are easy to apply incorrectly. Géron shows how to create **pipelines** in Scikit-Learn, including separate numerical and categorical branches.
-
-This compact example demonstrates the same idea in Python. It is **illustrative code**, not a dependency of the browser lab:
-
-```python
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
-numeric = make_pipeline(
-    SimpleImputer(strategy="median"),
-    StandardScaler(),
-)
-
-preprocess = ColumnTransformer([
-    ("numeric", numeric, ["area", "age"]),
-    ("neighborhood", OneHotEncoder(handle_unknown="ignore"), ["zone"]),
-])
-
-# The target column, price, is separate from X.
-X_train_ready = preprocess.fit_transform(X_train)
-X_valid_ready = preprocess.transform(X_valid)  # no fit on validation
-```
-
-A production pipeline also needs careful treatment of dataset versioning, unexpected column types, outliers, and drift. A fitted transformer should be deployed together with the model that expects its feature representation.
-
-## Knowledge Check
+## Quiz
 
 <PreprocessingQuiz />
 
@@ -209,12 +213,10 @@ You've now built a conceptual foundation for machine learning: what ML is, learn
 
 In **Module 02 — Regression & Optimization**, we'll turn these ideas into practical predictive models, beginning with **Linear Regression**.
 
-### Academic References
+## References
 
 **Primary:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed., O'Reilly Media, 2022/2023. Chapter 2, “Prepare the Data for Machine Learning Algorithms,” pp. **67–87**: “Clean the Data” (pp. 68–71), “Handling Text and Categorical Attributes” (pp. 71–75), “Feature Scaling and Transformation” (pp. 75–83), and “Transformation Pipelines” (pp. 83–87). Also Chapter 2, “Create a Test Set” (p. 55 onward).
 
 **Source notebooks:** <a href="https://github.com/ageron/handson-ml3" target="_blank" rel="noopener noreferrer">Géron's official open-source Jupyter notebooks</a>.
 
 This lesson contains original explanations, a synthetic dataset, and an original learning experiment. It does not reproduce copyrighted book illustrations or chapter text.
-
-</LessonWorkbench>

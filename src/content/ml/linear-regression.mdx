@@ -1,0 +1,202 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import LinearRegressionLab from "@/components/labs/LinearRegressionLab";
+import LinearRegressionQuiz from "@/components/learning/LinearRegressionQuiz";
+
+## Predicting a Number With a Straight Line
+
+Imagine you have a small table recording **study hours** and **practice-test scores**. The observations suggest that students with more hours of preparation *tend* to have higher scores. Can we summarize that trend with a mathematical rule and use it to make an approximate prediction for a new number of hours?
+
+**Linear regression** starts with a simple assumption: the expected output changes linearly as the input changes. For this introductory lesson, we use **one input feature** and **one numerical target**. Our dataset is fictional and demonstrates a statistical association; it does not show that adding study time necessarily causes a particular score increase.
+
+This lesson is grounded in **Aurélien Géron, *Hands-On Machine Learning*, 3rd edition**, Chapter 4, **“Linear Regression”** (pp. 132–137), and Chapter 1, **“Model-Based Learning”** (pp. 22–26). Géron introduces the model, a squared-error objective, and the Normal Equation. Jav's Lab uses independently written explanations and a browser-based interactive experiment.
+
+## What You'll Learn
+
+By the end, you should be able to:
+
+1. Explain the meaning of the **intercept** and **slope** in a regression model.
+2. Distinguish **observed values**, **predictions**, and **residuals**.
+3. Understand why **ordinary least squares** (OLS) fits a particular line.
+4. Change the dataset and observe how the best-fitting coefficients respond.
+5. Interpret **MSE**, **RMSE**, and **R²** without overclaiming what they prove.
+
+## 1. The Model: An Intercept and a Slope
+
+For a single numerical feature, the linear regression model is:
+
+$$
+\hat{y}=\theta_0+\theta_1 x
+$$
+
+Here:
+
+| Symbol | Meaning | In our example |
+| --- | --- | --- |
+| $x$ | Input feature | Study hours |
+| $y$ | Observed target | Recorded practice score |
+| $\hat{y}$ | Predicted target | Predicted practice score |
+| $\theta_0$ | Intercept | Prediction when $x=0$ |
+| $\theta_1$ | Slope | Predicted score change for one extra hour |
+
+Suppose we choose **intercept = 20** and **slope = 7**. For someone who studies five hours, the line predicts:
+
+$$
+\hat{y}=20+7(5)=55
+$$
+
+The **intercept** moves the line up or down. The **slope** controls how steeply the prediction changes with the input. A negative slope would produce a decreasing line. You can adjust both parameters in the lab before allowing the computer to fit them.
+
+**Important:** A straight-line model is an assumption about the *relationship we choose to model*. It need not be a correct description of every real-world problem, and the intercept may be uninformative if zero lies far outside the observed range.
+
+## 2. What Counts as an Error?
+
+A training observation has an input $x_i$ and a recorded output $y_i$. We ask the line to predict $\hat{y}_i$ at that same input.
+
+The difference between the observed and predicted value is its **residual**:
+
+$$
+ r_i=y_i-\hat{y}_i
+$$
+
+A residual is a **vertical distance with a sign**, not the perpendicular distance to the line. Residuals above and below the line can cancel if added directly, even when every prediction is poor. We need a cost function that prevents those cancellations.
+
+**Sum of squared errors (SSE)** adds the *squares* of every residual:
+
+$$
+\mathrm{SSE}(\theta_0,\theta_1)=\sum_{i=1}^{n}(y_i-\theta_0-\theta_1x_i)^2
+$$
+
+The **mean squared error (MSE)** divides this total by the number of training examples:
+
+$$
+\mathrm{MSE}=\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2
+$$
+
+Because $n$ is fixed during fitting, the line that minimizes SSE also minimizes MSE. Squaring emphasizes large mistakes: a residual of 10 contributes 100 to SSE, while a residual of 2 contributes only 4.
+
+For easier interpretation, **root mean squared error** takes the square root of MSE and returns to the original target units:
+
+$$
+\mathrm{RMSE}=\sqrt{\mathrm{MSE}}
+$$
+
+These are **training errors** when measured on the very examples used to fit the line. For reliable claims about new cases, we still need the separate evaluation procedures introduced in <Link href="/learn/ml/training-validation-and-testing">Lesson 05</Link>.
+
+## 3. Ordinary Least Squares: Fit the Line
+
+For simple linear regression with varying input values, there is a direct solution for the intercept and slope that minimize the sum of squared residuals. This method is called **ordinary least squares** (OLS).
+
+Let $\bar{x}$ and $\bar{y}$ be the training means of the inputs and observed targets. The fitted slope is:
+
+$$
+\hat{\theta}_1=\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}
+$$
+
+Then the fitted intercept is:
+
+$$
+\hat{\theta}_0=\bar{y}-\hat{\theta}_1\bar{x}
+$$
+
+The numerators and denominators summarize how the inputs and targets vary together. If the inputs have **no variation**, the denominator is zero, so a unique slope cannot be learned from the data. Our lab handles that case by showing a constant line at the average target; that is a reasonable fallback, **not a uniquely identified slope**.
+
+Géron also introduces the matrix formulation and the **Normal Equation** in Chapter 4. We'll return to multiple features and matrix notation in **Lesson 11 — Multiple Linear Regression**. In this experiment, we implement the equivalent closed-form calculation directly in TypeScript. There is **no precomputed animation** and no external prediction API.
+
+## 4. Understanding R²
+
+The lab also displays **R²**, the coefficient of determination, calculated on the current training points:
+
+$$
+R^2=1-\frac{\sum_i(y_i-\hat{y}_i)^2}{\sum_i(y_i-\bar{y})^2}
+$$
+
+R² compares the line's squared error with the error of a simple baseline that always predicts the *mean* target. With an intercept included, an ordinary least-squares fit on its own training data has an R² between 0 and 1 (apart from floating-point rounding and degenerate targets). **A manually chosen poor line can have negative R²**, indicating that it fits worse than the mean baseline.
+
+R² cannot establish that one variable **causes** another. It also does not guarantee accuracy on new data. When every target is identical, the usual denominator becomes zero; the lab reports **N/A** for a nonperfect fit rather than pretending a meaningful proportion exists.
+
+## 5. Why We Need More Than Linear Regression
+
+A straight line can summarize an approximately linear trend, but it cannot describe every relationship. A model may also be affected by missing features, outliers, sample selection, measurement errors, or distribution shifts.
+
+Furthermore, even an excellent linear fit to observational data does not justify a causal claim. Study time and practice score, for example, may both be related to prior knowledge, quality of teaching, and many unmeasured factors.
+
+Later in Module 2 we'll learn how to choose loss functions, optimize parameters iteratively with gradient descent, handle multiple features, fit nonlinear curves, and control complexity with regularization.
+
+<LessonWorkbench lab={<LinearRegressionLab />} name="Linear Regression — Fit the Best Line">
+
+## Lab Guide
+
+**Linear Regression — Fit the Best Line**
+
+On the right, gold points show **synthetic observations**: study hours on the horizontal axis and practice scores on the vertical axis. A gold line represents the current prediction model. Dotted vertical segments show the residuals between recorded scores and predictions.
+
+### Mission 01 — Fit the line yourself
+
+Start with **Clear upward trend**. Change the **Intercept** and **Slope** sliders manually. Watch the line move and the **MSE** decrease or increase.
+
+Try to reach a small MSE without pressing **Fit least squares**. A line that looks visually close may still have noticeable squared errors. Compare the residual segments: are the most distant points dominating the loss?
+
+Now press **Fit least squares**. The browser calculates the exact OLS coefficients for the current points and updates the line. You can also enable **Show least-squares reference** while adjusting your own model to compare the two lines.
+
+### Mission 02 — Move the data and change the answer
+
+Drag one observation to a new location, or focus a point and use the arrow keys. The OLS line automatically recalculates **while fitted mode is active**. Click empty graph space to add a new observation, and use **Remove last point** to remove the last item in the current set.
+
+Try moving one high-$x$ observation much higher or lower. How much does the slope change? Compare that with moving a point close to the center of the dataset.
+
+This demonstrates an important fact: **regression coefficients depend on the data**. A small, unrepresentative sample may produce a misleading line.
+
+### Mission 03 — What if the trend is not positive?
+
+Choose **Negative relationship**, then press **Fit least squares**. The slope should become negative, because the recorded target generally declines as the input increases.
+
+A negative slope is not a special learning algorithm. The same OLS calculation works for positive and negative relationships. It also shows that the term *regression* describes the prediction task, not the direction of the relationship.
+
+### Mission 04 — Investigate an outlier
+
+Choose **Influential outlier**. Most points follow a similar upward trend, but one unusually low target occurs at a high input value.
+
+First fit the line. Compare its position with **Clear upward trend**. Then drag the unusual observation toward the trend. The slope and RMSE should respond.
+
+OLS minimizes **squared** errors, so a large residual can have a major effect on the solution. This is why data quality and outlier investigation matter. An unusual observation is not necessarily incorrect, so you should not simply remove every outlier without understanding its source.
+
+### Mission 05 — Use the line to make a prediction
+
+Move the **New input / hours** slider. The teal marker shows where that input meets the regression line, and the predicted score appears underneath the graph.
+
+Try an input near the center of the observed examples, then move toward an extreme. Predictions beyond the well-supported input range are examples of **extrapolation** and require caution: a fitted line can keep rising forever even when real-world scores have a maximum.
+
+## Guided Practice
+
+Use the experiment to answer these questions **before** opening the knowledge check:
+
+1. Begin with the clear trend. Can you manually lower MSE? What do intercept and slope change differently?
+2. Press **Fit least squares**. Does your line match the calculated solution? Why would two visually similar lines have different MSE values?
+3. Select the falling dataset and predict at $x=5$. Is the slope negative? What does it mean?
+4. Choose the influential-outlier data, fit OLS, and drag the unusual point. Which coefficient changes most?
+5. Set a deliberately poor manual line. Can R² become negative? What does a negative value tell you?
+
+</LessonWorkbench>
+
+## Quiz
+
+<LinearRegressionQuiz />
+
+## Key Takeaways
+
+- A **linear regression model** predicts a numerical target from an input using a straight-line rule.
+- The **slope** controls change per input unit; the **intercept** sets the predicted value at zero.
+- A **residual** is observed minus predicted target; **OLS** minimizes the sum of their squares.
+- **MSE**, **RMSE**, and **R²** summarize fit, but training metrics do not replace unseen-data evaluation.
+- Points with extreme errors or unusual input values can strongly influence an OLS fit.
+
+## References
+
+**Primary academic reference:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed., O'Reilly, Chapter 4, “Training Models,” **Linear Regression and the Normal Equation**, pp. 132–137. Background: Chapter 1, “Model-Based Learning,” pp. 22–26.
+
+**Official companion notebooks:** <Link href="https://github.com/ageron/handson-ml3">Hands-On ML, 3rd edition — GitHub ↗</Link>. Jav's Lab uses original instructional text, fictional data, interactive controls, and quiz questions. This lesson is an introduction to OLS, not a reproduction of the book's code or figures.
+
+**Previous:** <Link href="/learn/ml/data-preprocessing">07 — Data Preprocessing</Link>  
+**Course:** <Link href="/subjects/ml">All Machine Learning modules ↗</Link>  
+**Next:** 09 — Loss Functions *(planned)*

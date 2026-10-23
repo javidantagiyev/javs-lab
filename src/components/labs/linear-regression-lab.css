@@ -1,0 +1,33 @@
+.jml8-lab{--j8-gold:#dfbb85;--j8-line:#514838;--j8-muted:#a9a294;--j8-teal:#96c5b6;container-name:jml8;container-type:inline-size;color:#e9e1d3;background:#131510;border:1px solid #494233;border-radius:9px;overflow:hidden;font-family:inherit;box-shadow:0 14px 55px #0003}
+.jml8-lab *{box-sizing:border-box}
+.jml8-lab button,.jml8-lab select{cursor:pointer}
+.jml8-lab button:disabled{opacity:.45;cursor:not-allowed}
+.jml8-lab :focus-visible{outline:2px solid var(--j8-gold);outline-offset:3px}
+.jml8-header{padding:13px 15px 10px;display:flex;justify-content:space-between;align-items:center;gap:9px;border-bottom:1px solid #34392e;background:linear-gradient(100deg,#1b1e18,#11130f)}
+.jml8-overline,.jml8-section-title,.jml8-live,.jml8-footer,.jml8-model>span,.jml8-model>small{font:9px ui-monospace,Consolas,monospace;letter-spacing:.1em}
+.jml8-overline{color:#ad9369}
+.jml8-header h3{font-size:23px;line-height:1.2;margin:5px 0 0;font-weight:500;letter-spacing:-.035em;color:#f6eedf}
+.jml8-header em{color:var(--j8-gold);font-family:Georgia,serif;font-weight:400}
+.jml8-live{color:#aac6b4;white-space:nowrap;display:flex;align-items:center;gap:6px}.jml8-live i{display:inline-block;width:6px;height:6px;border-radius:100%;background:#a9d2b9}
+.jml8-model{background:#22221c;padding:8px 13px;display:flex;gap:10px;justify-content:space-between;align-items:center;border-bottom:1px solid #413d32;min-width:0}.jml8-model>span{color:#a69a85}.jml8-model strong{font:15px ui-monospace,Consolas,monospace;color:#f1d5a7;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.jml8-model>small{color:#b29e7c;white-space:nowrap}
+.jml8-main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(190px,.65fr);gap:9px;padding:10px;align-items:start}
+.jml8-graph-area,.jml8-controls{min-width:0}
+.jml8-section-title{display:flex;justify-content:space-between;gap:9px;color:#d4b17d;align-items:center;margin:1px 0 7px}.jml8-section-title span:last-child:not(:first-child){color:#918979;font-size:8px;text-align:right}
+.jml8-chart{width:100%;display:block;height:auto;max-height:300px;user-select:none;border-radius:6px;border:1px solid #43473c;touch-action:none}
+.jml8-axis-text{fill:#989c8c;font-size:10px;font-family:ui-monospace,Consolas,monospace}.jml8-axis-label{fill:#b3a58d;font-size:8px;letter-spacing:.08em;font-family:ui-monospace,Consolas,monospace}
+.jml8-legend{display:flex;gap:8px 11px;align-items:center;flex-wrap:wrap;font-size:9px;color:#bab2a2;margin:7px 0}.jml8-legend span{display:flex;gap:5px;align-items:center}.jml8-legend i{display:inline-block;flex:none}.jml8-legend .dot{width:7px;height:7px;border-radius:100%;background:#dabb88}.jml8-legend .line{width:12px;height:2px;background:#efc68c}.jml8-legend .teal{width:12px;height:0;border-top:2px dashed #91c0b3}
+.jml8-check{display:flex;align-items:center;gap:7px;min-height:21px;color:#b2ae9f;font-size:10px;cursor:pointer}.jml8-check input{accent-color:var(--j8-gold);width:13px;height:13px;margin:0}
+.jml8-controls{padding:11px;background:#1c2018;border:1px solid #424335;border-radius:7px;display:flex;flex-direction:column;gap:11px}
+.jml8-controls .jml8-section-title{border-bottom:1px solid #3d4135;padding-bottom:8px;margin-bottom:0}
+.jml8-select{display:flex;flex-direction:column;gap:5px;color:#baac92;font-size:9px;letter-spacing:.04em}.jml8-select select{border:1px solid #554c39;border-radius:5px;background:#131711;color:#f2e6d2;padding:8px 6px;font-size:11px;max-width:100%}
+.jml8-range{display:block}.jml8-range>span{display:flex;justify-content:space-between;gap:6px;color:#c6baa5;font-size:10px}.jml8-range strong{color:#f0c995;font:12px ui-monospace,Consolas,monospace}.jml8-range input[type=range],.jml8-prediction input[type=range]{width:100%;accent-color:#dcb984;cursor:pointer}
+.jml8-primary{background:#d6b27d;color:#1f1a10;font-weight:700;font-size:11px;border:1px solid #d6b27d;padding:10px 8px;min-height:38px;border-radius:5px}.jml8-primary:hover{background:#f0cb91}
+.jml8-secondary-actions{display:flex;gap:6px;flex-wrap:wrap}.jml8-secondary-actions button{flex:1 1 44%;border:1px solid #5b513e;color:#d9c7ab;background:#29271f;border-radius:5px;font-size:9px;padding:8px 5px;min-height:32px}.jml8-secondary-actions button:hover:not(:disabled){background:#3a3327}
+.jml8-rule{line-height:1.5;color:#aca797;font-size:10px}.jml8-rule strong{color:#e1c292;font-weight:500}
+.jml8-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:#424133;border-top:1px solid #444334;border-bottom:1px solid #444334}.jml8-metrics>div{background:#1f211a;padding:9px 12px;min-width:0}.jml8-metrics span{display:block;color:#a8a092;font:9px ui-monospace,Consolas,monospace;letter-spacing:.05em}.jml8-metrics strong{display:block;color:#eed0a3;font-size:17px;line-height:1.5;font-weight:500}
+.jml8-prediction{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:9px 13px;background:#1b1d18}.jml8-prediction label{display:flex;flex-direction:column;gap:2px;color:#a99d86;font:9px ui-monospace,Consolas,monospace;letter-spacing:.04em;min-width:115px;width:40%;max-width:180px}.jml8-prediction>span{font-size:11px;color:#c9bead;text-align:right}.jml8-prediction strong{color:#e7c38c}
+.jml8-note{font-size:10px;line-height:1.5;color:#c0b59e;margin:0;padding:6px 13px 11px;background:#1b1d18}
+.jml8-footer{padding:8px 13px;background:#141610;border-top:1px solid #383a2d;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#92836a;font-size:8px}
+@container jml8 (max-width:660px){.jml8-main{grid-template-columns:1fr}.jml8-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.jml8-controls>.jml8-section-title,.jml8-primary,.jml8-secondary-actions,.jml8-rule{grid-column:1/-1}.jml8-model>small{display:none}}
+@container jml8 (max-width:380px){.jml8-header h3{font-size:20px}.jml8-live{display:none}.jml8-controls{grid-template-columns:1fr}.jml8-controls>.jml8-section-title,.jml8-primary,.jml8-secondary-actions,.jml8-rule{grid-column:auto}.jml8-model{flex-wrap:wrap;gap:4px}.jml8-model strong{font-size:13px}.jml8-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.jml8-prediction{flex-wrap:wrap}.jml8-prediction label{width:100%}.jml8-prediction>span{text-align:left}}
+@media(prefers-reduced-motion:reduce){.jml8-lab *{scroll-behavior:auto!important}}

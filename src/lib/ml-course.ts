@@ -29,8 +29,8 @@ export const mlCourse: CourseModule[] = [
   {
     number: 2, title: "Regression & Optimization", subtitle: "Predict numbers and learn how to fit models.", chapters: "GÉRON / CHAPTER 4",
     lessons: [
-      { number: 8, title: "Linear Regression", description: "Fit a line through noisy observations." },
-      { number: 9, title: "Loss Functions", description: "Compare MAE, MSE and RMSE." },
+      { number: 8, title: "Linear Regression", description: "Fit a line through noisy observations.", href: "/learn/ml/linear-regression"  },
+      { number: 9, title: "Loss Functions", description: "Compare MAE, MSE and RMSE.", href: "/learn/ml/loss-functions"  },
       { number: 10, title: "Gradient Descent", description: "Navigate the loss surface, one update at a time.", href: "/learn/ml/gradient-descent" },
       { number: 11, title: "Multiple Linear Regression", description: "Predict using several input features." },
       { number: 12, title: "Polynomial Regression", description: "See how flexibility shapes a fitted curve." },

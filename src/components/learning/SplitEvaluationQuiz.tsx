@@ -1,7 +1,5 @@
 "use client";
-import { useState } from "react";
-import "./split-evaluation-quiz.css";
-
+import SequentialQuiz from "./SequentialQuiz";
 type Question = { prompt: string; choices: [string, string, string]; correct: number; why: string };
 const QUESTIONS: readonly Question[] = [
   { prompt: "You have 100 labeled examples and use a 60/20/20 split. How many belong to the validation set?", choices: ["60", "20", "40"], correct: 1, why: "A 60/20/20 split assigns 60% to training, 20% to validation, and 20% to testing. With 100 records, validation contains 20." },
@@ -12,20 +10,13 @@ const QUESTIONS: readonly Question[] = [
 ];
 
 export default function SplitEvaluationQuiz() {
-  const [answers, setAnswers] = useState<(number | null)[]>(() => QUESTIONS.map(() => null));
-  const [submitted, setSubmitted] = useState(false);
-  const finished = answers.every(answer => answer !== null);
-  const score = answers.reduce<number>((total, answer, index) => total + Number(answer === QUESTIONS[index].correct), 0);
-  return <section className="jml5q" aria-label="Training validation and testing knowledge check">
-    <div className="jml5q-head"><span>LESSON 005 / KNOWLEDGE CHECK</span><span>{submitted ? `${score} / ${QUESTIONS.length} CORRECT` : `${answers.filter(a => a !== null).length} / ${QUESTIONS.length} ANSWERED`}</span></div>
-    {QUESTIONS.map((question, i) => <fieldset key={question.prompt} className="jml5q-question">
-      <legend><span>{String(i+1).padStart(2,"0")}</span> {question.prompt}</legend>
-      <div className="jml5q-options">{question.choices.map((choice, j) => <label key={choice} className={`${answers[i] === j ? "jml5q-selected" : ""} ${submitted && j === question.correct ? "jml5q-correct" : ""} ${submitted && answers[i] === j && j !== question.correct ? "jml5q-wrong" : ""}`}>
-        <input type="radio" name={`jml5q-${i}`} checked={answers[i] === j} disabled={submitted} onChange={() => setAnswers(old => old.map((value, n) => n === i ? j : value))} />{choice}
-      </label>)}</div>
-      {submitted && <p className="jml5q-reason"><strong>{answers[i] === question.correct ? "Correct." : "Review."}</strong> {question.why}</p>}
-    </fieldset>)}
-    <div className="jml5q-actions"><button type="button" onClick={() => { setAnswers(QUESTIONS.map(() => null)); setSubmitted(false); }}>Try again ↻</button><button type="button" disabled={!finished || submitted} onClick={() => setSubmitted(true)}>{submitted ? "Completed" : "Check answers →"}</button></div>
-    {submitted && <p className="jml5q-score" role="status">{score} of {QUESTIONS.length} correct. {score === QUESTIONS.length ? "Excellent—you can explain the purpose of each dataset partition." : "Review the explanations and test your understanding again."}</p>}
-  </section>;
+  return <SequentialQuiz
+    title="Training, Validation, and Testing"
+    questions={QUESTIONS.map(question => ({
+      prompt: question.prompt,
+      options: question.choices,
+      correct: question.correct,
+      explanation: question.why,
+    }))}
+  />;
 }

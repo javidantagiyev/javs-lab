@@ -69,6 +69,18 @@ export const subjects: Subject[] = [
         status: "available",
       },
       {
+        title: "Linear Regression",
+        description: "Explore the line of best fit, residuals, and regression predictions.",
+        href: "/learn/ml/linear-regression",
+        status: "available",
+      },
+      {
+        title: "Loss Functions (MAE, MSE, RMSE)",
+        description: "Compare errors, explore outliers, and discover mean versus median objectives.",
+        href: "/learn/ml/loss-functions",
+        status: "available",
+      },
+      {
         title: "Gradient Descent",
         description: "See how optimization moves toward lower loss — one step at a time.",
         href: "/learn/ml/gradient-descent",

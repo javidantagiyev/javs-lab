@@ -1,0 +1,192 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import LossFunctionsLab from "@/components/labs/LossFunctionsLab";
+import LossFunctionsQuiz from "@/components/learning/LossFunctionsQuiz";
+
+## Why a Prediction Needs a Score
+
+Imagine two models that predict the scores of six practice exams. Neither predicts everything perfectly. Which one is *better*? It depends on how we decide to measure mistakes.
+
+In <Link href="/learn/ml/linear-regression">Lesson 08 — Linear Regression</Link>, we fit a line by minimizing **squared residuals**. But squared errors are only one way to judge a predictor. **Loss functions** turn prediction mistakes into numbers that we can compare or minimize. The choice matters because different functions respond differently to large mistakes.
+
+This lesson follows **Aurélien Géron's *Hands-On Machine Learning*, 3rd edition**, especially Chapter 2, **“Select a Performance Measure”** (pp. 43–45), where Géron compares root mean squared error (RMSE) with mean absolute error (MAE) and discusses outliers, plus Chapter 4, **“Linear Regression”** (pp. 132–134), where squared error becomes a model-fitting objective. The teaching examples and interactive experiment below are original.
+
+## What You'll Learn
+
+By the end of this lesson you should be able to:
+
+1. Calculate a **residual**, absolute error, and squared error for an observation.
+2. Compute and interpret **MAE**, **MSE**, and **RMSE** for a dataset.
+3. Describe how one large mistake affects the different metrics.
+4. Explain why **MSE and RMSE rank models identically** when calculated from the same dataset.
+5. Discover why the **mean** and **median** can be different best constant predictions.
+
+## 1. From a Residual to a Loss
+
+Each example has a measured target $y_i$ and a model prediction $\hat{y}_i$. A **residual** records the signed difference:
+
+$$
+e_i=y_i-\hat{y}_i
+$$
+
+For a real score of **70** and a prediction of **64**, the residual is $+6$. If the prediction is **76**, the residual is $-6$. In both cases, the prediction misses by six points. Directly averaging signed residuals would let positive and negative errors cancel out, which is usually undesirable.
+
+Two common ways to remove that cancellation are **absolute value** and **squaring**:
+
+$$
+|e_i|\quad\text{and}\quad e_i^2
+$$
+
+A mistake of 6 gives an absolute error of **6** and squared error of **36**. A mistake of 12 gives an absolute error of **12** but squared error of **144**. Doubling an error doubles its absolute penalty but quadruples its squared penalty.
+
+## 2. Mean Absolute Error — MAE
+
+**Mean Absolute Error** averages the size of the mistakes:
+
+$$
+\mathrm{MAE}=\frac{1}{m}\sum_{i=1}^{m}|y_i-\hat{y}_i|
+$$
+
+MAE is measured in the same units as the target. If we're predicting a practice-exam score in **points**, an MAE of 4 means that predictions miss by **four points on average in absolute value** over the evaluated examples. It doesn't tell us whether predictions are systematically too high or too low.
+
+MAE treats an extra point of error the same way whether an observation is already close or far from its target. This makes MAE **less sensitive to very large residuals** than MSE, though it does not automatically make an MAE-based model immune to bad data.
+
+## 3. Mean Squared Error — MSE
+
+**Mean Squared Error** squares the mistakes before averaging them:
+
+$$
+\mathrm{MSE}=\frac{1}{m}\sum_{i=1}^{m}(y_i-\hat{y}_i)^2
+$$
+
+Because each residual is squared, a few especially large errors can dominate MSE. If one prediction misses by 40 points, it adds **1,600** to the total squared error *before* dividing by the number of samples.
+
+MSE also has a units caveat: when the target is measured in points, MSE is measured in **points squared**, which may be harder to interpret directly. On the positive side, squared loss is smooth and particularly convenient for optimization algorithms; ordinary least squares minimizes its sum or mean on the training data.
+
+## 4. Root Mean Squared Error — RMSE
+
+**Root Mean Squared Error** is the square root of MSE:
+
+$$
+\mathrm{RMSE}=\sqrt{\frac{1}{m}\sum_{i=1}^{m}(y_i-\hat{y}_i)^2}=\sqrt{\mathrm{MSE}}
+$$
+
+RMSE returns the metric to the target's original units. For example, if MSE = 25 points squared, RMSE = 5 points. Like MSE, RMSE is sensitive to large errors because it is still built from **squared residuals**.
+
+**A subtle but important fact:** square root is an increasing function for nonnegative values, so **the model with the lowest MSE also has the lowest RMSE**, provided both metrics are evaluated on the same data with the same weighting. The square root improves units and interpretation; it does *not* define a different winning model in that setting.
+
+## 5. Worked Example: Three Predictions
+
+Suppose our true values are $[10,20,30]$ and our predictions are $[12,17,35]$.
+
+| Sample | Actual | Predicted | Residual | Absolute error | Squared error |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| A | 10 | 12 | −2 | 2 | 4 |
+| B | 20 | 17 | +3 | 3 | 9 |
+| C | 30 | 35 | −5 | 5 | 25 |
+
+Therefore:
+
+$$
+\mathrm{MAE}=\frac{2+3+5}{3}=\frac{10}{3}\approx3.33
+$$
+
+$$
+\mathrm{MSE}=\frac{4+9+25}{3}=\frac{38}{3}\approx12.67
+$$
+
+$$
+\mathrm{RMSE}=\sqrt{\frac{38}{3}}\approx3.56
+$$
+
+Notice that MAE and RMSE have the original unit, while MSE uses squared units. They are not simply three interchangeable numbers on one scale.
+
+## 6. Loss Functions Versus Evaluation Metrics
+
+The same formula can be used for different purposes:
+
+- During **training**, a loss or cost guides the model toward better parameters.
+- During **evaluation**, a metric summarizes errors on a chosen dataset, ideally including examples the model has never seen.
+
+For linear regression, MSE is a natural *training objective*. MAE or RMSE can still be useful for reporting performance. The metric that a company cares about in production may not be identical to the objective used inside its optimizer.
+
+For a fixed dataset, minimizing **SSE** and minimizing **MSE** give the same fitted parameters: dividing by the positive constant $m$ does not change the minimizer. For the same reason, minimizing MSE also minimizes RMSE. However, MAE may favor different parameters; the mean-versus-median demonstration makes this difference visible.
+
+Never select the final model by repeatedly looking at test-set results. Use the validation set for choices and leave the test set for final evaluation, as in <Link href="/learn/ml/training-validation-and-testing">Lesson 05</Link>.
+
+<LessonWorkbench lab={<LossFunctionsLab />} name="Loss Functions — The Error Laboratory">
+
+## Lab Guide
+
+**Loss Functions — The Error Laboratory**
+
+The panel on the right displays six synthetic **actual targets** (gold) and six editable **predictions** (teal). Every dotted vertical segment is one residual. The MAE, MSE, and RMSE cards update instantly as you change predictions.
+
+### Mission 01 — Change one prediction
+
+Start with **Everyday mistakes**. Drag any teal point vertically, or select its sample and move the **Prediction** slider. Watch the residual length and all three metrics change.
+
+Select **MAE** at the top. The small bars below the plot now represent absolute-error contributions. Select **MSE**: the bars instead represent squared errors. For **RMSE**, the bars still show squared contributions because the square root is applied *after their mean*.
+
+Press **Show calculations** to see the per-example residuals, absolute errors, and squares. The same underlying data powers the visualization and the formulas.
+
+### Mission 02 — Introduce an extreme error
+
+Select **One huge mistake**. Observe how one unusually inaccurate prediction dominates the MSE contribution chart. Then select sample 6 and press **Make exact**.
+
+Did MSE fall more dramatically in its own units? Does RMSE still have the same units as the targets? Switch back to **Everyday mistakes** to see how the metrics behave with only small errors.
+
+**Caution:** MAE, MSE, and RMSE use different units or transformations. We should discuss their sensitivity to large mistakes, not claim that whichever has the largest raw number is automatically the worst metric.
+
+### Mission 03 — A consistent prediction bias
+
+Choose **Every prediction is +8**. Each prediction exceeds its corresponding target by eight points. Check the metrics: **MAE = 8**, **MSE = 64**, **RMSE = 8**.
+
+Why do MAE and RMSE match in this special case? All error magnitudes are identical, so the root-mean-square and arithmetic mean of absolute magnitudes coincide. Try changing *one* prediction and watch the equality disappear.
+
+### Mission 04 — One constant for everyone
+
+Scroll to **Experiment B — Mean or Median?** This simpler model ignores the input features and predicts a single constant for every example. The lab computes each possible constant prediction against the **actual target values** of the selected dataset.
+
+Click **Use mean**. Note the MAE, MSE, and RMSE. Then click **Use median** and compare. **On a fixed dataset, the mean minimizes squared loss, and any median minimizes absolute loss.** Since RMSE is a monotonic transformation of MSE, the mean also minimizes RMSE.
+
+If the targets are symmetric, the mean and median may be identical or nearly identical. For a stronger illustration, choose **Skewed target values**. Its six targets are $[24,26,28,29,31,99]$: the mean is 39.5 while the median is 28.5. The high value of 99 pulls the mean upward, but the median stays near the center of the other observations.
+
+### Mission 05 — Think about choosing a metric
+
+Imagine measuring typical errors in a system where occasional large errors are particularly costly. RMSE could highlight those large errors more strongly. In another situation, you might want an interpretable measure of typical absolute miss, and MAE may be more appropriate.
+
+**There is no universally best metric.** What matters is the task, target units, error costs, dataset quality, and whether evaluation uses data held out from training.
+
+## Guided Practice
+
+1. Start with the everyday-mistakes preset. Can you lower MAE by changing only one prediction?
+2. Switch to the extreme-error preset. Which observation contributes most to MSE, and why?
+3. Under the +8 preset, calculate all three metrics by hand and compare with the lab.
+4. Make all predictions exact. What should MAE, MSE, and RMSE become?
+5. In Experiment B, select **Skewed target values**. Which constant minimizes MSE? Which minimizes MAE?
+
+</LessonWorkbench>
+
+## Quiz
+
+<LossFunctionsQuiz />
+
+## Key Takeaways
+
+- A **residual** is actual minus predicted; taking absolute values or squares prevents positive and negative errors from canceling.
+- **MAE** measures average absolute error in the original target units.
+- **MSE** measures average squared error and more strongly emphasizes large residuals.
+- **RMSE** is the square root of MSE, restoring original units while retaining sensitivity to large errors.
+- For the **same data**, MSE and RMSE rank models identically; MAE can rank them differently.
+- For a **constant predictor**, a mean minimizes squared loss, while a median minimizes absolute loss.
+
+## References
+
+**Primary academic reference:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd ed., O'Reilly, **Chapter 2, “Select a Performance Measure,” pp. 43–45**, and **Chapter 4, “Linear Regression,” pp. 132–134**.
+
+**Official companion materials:** <Link href="https://github.com/ageron/handson-ml3">Géron's Hands-On ML notebooks ↗</Link>. The fictional dataset, lab code, explanations, and questions here are original educational material.
+
+**Previous:** <Link href="/learn/ml/linear-regression">08 — Linear Regression</Link>  
+**Course:** <Link href="/subjects/ml">All Machine Learning modules ↗</Link>  
+**Next:** <Link href="/learn/ml/gradient-descent">10 — Gradient Descent</Link>
