@@ -87,6 +87,22 @@ export const lessons: Lesson[] = [
   },
   {
     subject: "ml",
+    topic: "multiple-linear-regression",
+    title: "Multiple Linear Regression",
+    description: "Predict from two features, fit ordinary least squares, and explore correlated inputs.",
+    difficulty: "Intermediate",
+    content: () => import("@/content/ml/multiple-linear-regression.mdx"),
+  },
+  {
+    subject: "ml",
+    topic: "polynomial-regression",
+    title: "Polynomial Regression",
+    description: "Transform input powers, fit curved models, and compare validation errors.",
+    difficulty: "Intermediate",
+    content: () => import("@/content/ml/polynomial-regression.mdx"),
+  },
+  {
+    subject: "ml",
     topic: "gradient-descent",
     title: "Gradient Descent",
     description: "Learn optimization through interactive experiments.",

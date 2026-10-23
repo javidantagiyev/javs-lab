@@ -1,0 +1,275 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import PolynomialRegressionLab from "@/components/labs/PolynomialRegressionLab";
+import PolynomialRegressionQuiz from "@/components/learning/PolynomialRegressionQuiz";
+
+## When a Straight Line Is Not Enough
+
+In <Link href="/learn/ml/linear-regression">Lesson 08 — Linear Regression</Link>, we fitted a straight line through observations. In <Link href="/learn/ml/multiple-linear-regression">Lesson 11 — Multiple Linear Regression</Link>, we combined several input features in one prediction. But what if a relationship itself is **curved**?
+
+Think about the distance traveled by a falling object under simplified constant acceleration. Distance does not necessarily change by the same amount every second: a **squared-time term** can describe the curvature. Or imagine a synthetic measurement whose response increases at first and then decreases. A straight line cannot represent the turning point.
+
+We can keep the familiar linear-regression machinery and give it **new input features built from powers of the original measurement**. This is **polynomial regression**.
+
+This lesson is based primarily on Aurélien Géron's *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, **3rd edition, Chapter 4**, especially **“Polynomial Regression” (pp. 149–151)** and **“Learning Curves” (pp. 151–155)**. All examples and visualizations here are independently written for Jav's Lab.
+
+## Learning Objectives
+
+By the end of the lesson, you should be able to:
+
+1. Explain why a straight-line model may underfit curved observations.
+2. Construct polynomial features such as $x^2$, $x^3$, and $x^4$ from one input.
+3. Identify the **degree**, the **intercept**, and the number of model coefficients.
+4. Build a polynomial-regression design matrix and make predictions from its coefficients.
+5. Explain why the model is **linear in its coefficients**, even when its graph is curved.
+6. Fit polynomial coefficients using ordinary least squares and understand the role of feature scaling.
+7. Compare training and validation errors when choosing polynomial degree.
+8. Recognize the risks of overly high degree and of predictions far outside the observed input range.
+
+## 1. From Straight Lines to Curves
+
+A one-feature straight-line regression model has the form:
+
+$$
+\hat y=\theta_0+\theta_1x
+$$
+
+Changing $x$ by one unit changes the prediction by a constant amount $\theta_1$, no matter where you are on the graph. That is useful when the relationship is approximately linear, but it cannot model a U-shaped pattern.
+
+A **quadratic polynomial** adds one more term:
+
+$$
+\hat y=\theta_0+\theta_1x+\theta_2x^2
+$$
+
+The $x^2$ term allows the slope to change with $x$. Depending on the coefficients, the resulting curve may open upward or downward.
+
+A cubic model goes further:
+
+$$
+\hat y=\theta_0+\theta_1x+\theta_2x^2+\theta_3x^3
+$$
+
+Its curve can change direction more than once. Higher-degree terms provide more flexibility, but flexibility brings a risk: the model may begin to trace accidental noise in its training examples.
+
+**Degree** means the highest nonzero power of the input in the polynomial. A degree-$d$ polynomial in one feature has **up to $d+1$ coefficients**, including the intercept.
+
+| Degree | Model form | Parameters (including intercept) |
+| --- | --- | --- |
+| 1 | $\theta_0+\theta_1x$ | 2 |
+| 2 | $\theta_0+\theta_1x+\theta_2x^2$ | 3 |
+| 3 | $\theta_0+\theta_1x+\theta_2x^2+\theta_3x^3$ | 4 |
+| 5 | $\theta_0+\theta_1x+\cdots+\theta_5x^5$ | 6 |
+
+A model's *allowed* degree may be $d$ even when its fitted highest-order coefficient is exactly zero, in which case the resulting mathematical polynomial has lower actual degree.
+
+## 2. Polynomial Features: Change the Inputs, Not the Target
+
+Suppose the original dataset contains a single measurement $x$. We transform it into additional columns:
+
+$$
+\phi(x)=\begin{bmatrix}x & x^2 & x^3\end{bmatrix}
+$$
+
+For example, if $x=2$, the transformed input is $[2,4,8]$. If $x=-2$, the transformed input is $[-2,4,-8]$. The **even powers** behave differently from the **odd powers**; the model can use both kinds of behavior.
+
+A degree-2 regression with an intercept and three observations $x=0$, $x=1$, and $x=2$ has the design matrix:
+
+$$
+X=\begin{bmatrix}
+1&0&0\\
+1&1&1\\
+1&2&4
+\end{bmatrix}
+\qquad
+\boldsymbol\theta=\begin{bmatrix}\theta_0\\\theta_1\\\theta_2\end{bmatrix}
+$$
+
+The first column is a constant **1** for the intercept. The next two columns are $x$ and $x^2$. Predictions for the entire dataset are:
+
+$$
+\hat{\mathbf y}=X\boldsymbol\theta
+$$
+
+Notice what has *not* changed: each training example still has **one observed target**. Polynomial feature engineering increases the number of **inputs supplied to the regression model**, not the number of target variables.
+
+## 3. Worked Example — Fit a Quadratic Pattern
+
+Consider three noiseless observations:
+
+| $x$ | Observed $y$ | $x^2$ |
+| --- | --- | --- |
+| 0 | 1 | 0 |
+| 1 | 2 | 1 |
+| 2 | 5 | 4 |
+
+Assume a quadratic model $\hat y=\theta_0+\theta_1x+\theta_2x^2$.
+
+At $x=0$, the observed target is 1, so $\theta_0=1$. The remaining observations give:
+
+$$
+\begin{aligned}
+\theta_1+\theta_2&=1\\
+2\theta_1+4\theta_2&=4
+\end{aligned}
+$$
+
+Solving these equations gives $\theta_1=0$ and $\theta_2=1$. Therefore:
+
+$$
+\boxed{\hat y=1+x^2}
+$$
+
+Check: at $x=2$, $\hat y=1+2^2=5$; at $x=-2$, the prediction would also be 5. With noiseless data and enough independent observations, a degree-2 model can recover this exact pattern.
+
+Real measurements rarely lie perfectly on one curve. The next step is to fit coefficients that make the predictions **as close as possible overall**, rather than forcing the model through every point.
+
+## 4. How a Curved Model Can Still Be Linear Regression
+
+The word *linear* in **linear regression** describes how the unknown coefficients enter the prediction equation, not necessarily whether the graph is a straight line in the original input.
+
+For a quadratic model:
+
+$$
+\hat y=\underbrace{\theta_0}_{\text{constant}}+
+\underbrace{\theta_1}_{\text{coefficient}}x+
+\underbrace{\theta_2}_{\text{coefficient}}x^2
+$$
+
+Each unknown parameter $\theta_j$ appears to the **first power** and multiplies a known feature value. We are not trying to fit expressions such as $\theta_1^2$, $\sin(\theta_1)$, or $x^{\theta_1}$.
+
+Consequently, ordinary linear least squares can fit the model after we construct the polynomial features. It does **not** require a different optimization algorithm just because the resulting prediction curve bends.
+
+For $m$ training examples, the squared-error objective is:
+
+$$
+J(\boldsymbol\theta)=\frac{1}{m}
+\sum_{i=1}^{m}\left(y^{(i)}-\sum_{j=0}^{d}\theta_j(x^{(i)})^j\right)^2
+$$
+
+We seek the coefficient vector $\boldsymbol\theta$ that **minimizes this training loss**. This connects to <Link href="/learn/ml/loss-functions">Lesson 09 — Loss Functions</Link> and <Link href="/learn/ml/gradient-descent">Lesson 10 — Gradient Descent</Link>.
+
+In the browser lab, **Fit selected degree** computes ordinary least squares using a small **Householder QR factorization** of the polynomial design matrix. That avoids explicitly calculating the inverse of $X^{\mathsf T}X$, which can be numerically fragile.
+
+The lab's $x$ values are deliberately normalized to roughly $[-1,1]$. This keeps powers such as $x^8$ from becoming enormous due to input units alone, though very high-degree polynomial fitting can **still** be ill-conditioned or unstable. Proper feature scaling improves numerical behavior; it does not eliminate all overfitting.
+
+## 5. Polynomial Degree Is a Hyperparameter
+
+The model **learns** its coefficients from training data, but we **choose** the maximum polynomial degree before fitting. Degree is therefore a **hyperparameter**, like the learning rate or the number of neighbors in k-nearest neighbors.
+
+A degree-1 model may be too simple for a curved relationship. A degree-2 model may capture a quadratic relationship well. A degree-9 model has many more degrees of freedom and may become unnecessarily sensitive to individual points, particularly with a small noisy training set.
+
+The sensible goal is **not** simply to make training RMSE as close to zero as possible. It is to find a complexity that predicts **new observations** reliably.
+
+The standard workflow is:
+
+1. Fit each candidate degree using **training examples only**.
+2. Compare errors on **validation examples** not used to fit those coefficients.
+3. Choose the degree using validation performance and the simplicity required for your task.
+4. Evaluate the finalized model **once** on a separate test set.
+
+In our lab, the **Compare degrees** panel reports training and validation RMSE for degrees 1–9. It is a **model-complexity comparison**: its horizontal dimension would be *degree*. A classical **learning curve**, as discussed by Géron, instead tracks training/validation error against **training-set size** or training progress. You can explore training-size effects separately using the sample-count control.
+
+### A training gap does not always tell the whole story
+
+- **Underfitting:** Both training and validation errors are relatively high. The polynomial may lack enough flexibility.
+- **Overfitting:** Training error is much lower than validation error. The fit may be following accidental variations in training examples.
+- **Reasonable fit:** Validation error is low for the task, and the complexity is no greater than necessary. No single universal gap or RMSE threshold defines success.
+
+A model's outcome depends on the particular sample, the noise, the input range, and how the training and validation examples were collected. We do not know the true generating function for real data, even though the synthetic lab can reveal its hidden reference curve for teaching.
+
+## 6. Why More Features Are Not Always Better
+
+Adding a polynomial power creates another model parameter. In **ordinary least squares**, with all other conditions unchanged, adding columns cannot increase the *minimum achievable training sum of squared errors*: the richer model can always set the extra coefficient to zero.
+
+This mathematical fact says **nothing** about what will happen to validation error. The more flexible model may find parameters that match its training examples more closely yet fluctuate dramatically between those examples.
+
+The situation is most obvious when training data are scarce. With 12 noisy observations and a degree-9 model, there are 10 coefficients to estimate. That leaves little information to distinguish a genuine curve from random deviations. With 48 observations, the same degree has more evidence to constrain its fitted shape.
+
+**Important:** There is no rule that degree 2 is always best. A linear trend, an S-shaped cubic trend, and a complicated real pattern may call for different degrees or even an entirely different model family.
+
+## 7. Outliers, Extrapolation, and Other Limitations
+
+**Outliers.** Squared-error fitting penalizes large residuals strongly. A single unusually high or low observation can pull a polynomial curve away from its previous fit. Try the lab's **Quadratic + outlier** scenario, then drag the unusual point.
+
+**Extrapolation.** A polynomial fitted for $x\in[-1,1]$ can be evaluated mathematically at $x=8$, but high powers increase very quickly: $8^5=32{,}768$. Predictions far outside the observed input range can become implausible, even when validation error inside the original range looks good.
+
+**Numerical stability.** Powers of $x$ can produce columns that are highly correlated or nearly dependent. Very high degrees can therefore cause unstable coefficient estimates. The lab is for small, normalized examples; production systems use appropriate scaling, regularization, and robust numerical libraries.
+
+**Multiple original features.** If the original measurements are $a$ and $b$, polynomial feature expansion can also create **interaction terms** like $ab$, $a^2b$, and $ab^2$. Géron describes this in Chapter 4. The present lab deliberately uses **one original feature** so that every curve can be drawn in two dimensions. We'll cover controlling the complexity of large feature sets in <Link href="/subjects/ml">Lesson 13 — Regularization</Link>.
+
+## 8. Python Connection — Scikit-Learn
+
+The same transformation can be implemented using Scikit-Learn's `PolynomialFeatures`. This short illustration creates powers of one input up to degree 2 and then fits a linear regression:
+
+```python
+import numpy as np
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+
+X = np.array([[-2.0], [-1.0], [0.0], [1.0], [2.0]])
+y = np.array([5.0, 2.0, 1.0, 2.0, 5.0])
+
+model = make_pipeline(
+    PolynomialFeatures(degree=2, include_bias=False),
+    LinearRegression(),
+)
+model.fit(X, y)
+print(model.predict(np.array([[3.0]])))  # Approximately 10
+```
+
+`include_bias=False` avoids adding a duplicate constant column because `LinearRegression()` includes an intercept by default. For a real prediction task, split the dataset before training and **fit preprocessing and models on the training split only**, ideally within a pipeline and a suitable validation procedure.
+
+<LessonWorkbench lab={<PolynomialRegressionLab />} name="Polynomial Regression — Curved Fit Studio">
+
+## Lab Guide
+
+**One input, many powers.** All observations are synthetic. The chart's $x$ feature is already normalized; gold points are **training examples**, teal points (optional) are **validation**, and purple circles are the **final test examples**, which remain hidden until you commit to a model.
+
+### Mission 01 — Begin with a straight line
+
+Leave **Curved / quadratic** selected, set **Degree 1**, and press **Fit selected degree**. Turn on **True synthetic function** to compare the fitted straight line to the underlying curve. Where does the straight line miss systematically? Compare training and validation RMSE.
+
+### Mission 02 — Give the model a squared feature
+
+Switch to **Degree 2**, fit again, and examine the curve and both errors. How does the additional $x^2$ feature change the model's shape? Try **Degree 3**, too. Does a higher degree necessarily improve validation error?
+
+### Mission 03 — Compare all nine degrees
+
+Press **Compare degrees 1–9 on validation**. Inspect both training and validation RMSE and select a promising degree with **Use**. Is the smallest *training* error also the smallest *validation* error? Repeat after lowering **Training samples** from 24 to 12.
+
+### Mission 04 — Change the data, refit
+
+Drag a gold training point vertically (or focus one and use the arrow keys). The fitted curve disappears because its coefficients belonged to the old data. Press **Fit selected degree** to calculate new coefficients. Repeat with the **Quadratic + outlier** scenario.
+
+### Mission 05 — Fit different patterns and noise
+
+Switch between **Straight / linear**, **Curved / quadratic**, and **S-shaped / cubic**. Choose several degrees and compare. Increase **Noise** and explore **12, 24, and 48** training samples. Observe that higher degree is *available capacity*, not automatic proof of a better model.
+
+### Mission 06 — Seal the test
+
+Compare models using validation **without opening the test set**. Fit your chosen model, press **Commit & reveal test**, and explain the test RMSE in the context of this one synthetic sample. The model then locks; choose **New dataset** to start a separate experiment.
+
+</LessonWorkbench>
+
+## Quiz
+
+<PolynomialRegressionQuiz />
+
+## Key Takeaways
+
+- **Polynomial regression** creates new features from powers of the original measurements and fits a linear combination of their coefficients.
+- A one-input degree-$d$ model includes powers up to $x^d$ and has up to **$d+1$ coefficients** with an intercept.
+- Curved predictions remain **linear in their unknown coefficients**, so ordinary least squares can fit the model.
+- Higher polynomial degree cannot worsen the *minimum training squared error* when fitting the same examples with nested features, but can worsen validation and test error.
+- Pick polynomial degree using **validation data**, not the final test data. Fit coefficients on the training split only.
+- Small datasets, outliers, numerical instability, and **extrapolation beyond the observed range** all require caution.
+
+## References
+
+**Primary textbook:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, **3rd edition**, O'Reilly, Chapter 4: **“Polynomial Regression”** (pp. **149–151**) and **“Learning Curves”** (pp. **151–155**). The book motivates polynomial feature expansion, linear least-squares fitting on expanded features, training/validation errors, and the bias–variance trade-off.
+
+**Supporting textbook sections:** Géron, Chapter 2, **“Select a Performance Measure”** and **“Create a Test Set”** (pp. 43–60), for held-out evaluation, and Chapter 4, **“Linear Regression”** (pp. 132–137), for ordinary least squares and its objective.
+
+**Optional code resource:** [Géron's official third-edition notebooks](https://github.com/ageron/handson-ml3), especially the Chapter 4 training-models notebook. Jav's Lab's explanations, synthetic dataset, and browser lab are original materials; we do not republish the textbook content.

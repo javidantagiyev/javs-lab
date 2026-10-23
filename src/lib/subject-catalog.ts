@@ -81,6 +81,18 @@ export const subjects: Subject[] = [
         status: "available",
       },
       {
+        title: "Multiple Linear Regression",
+        description: "Fit models with multiple features, residuals, and held-out evaluation.",
+        href: "/learn/ml/multiple-linear-regression",
+        status: "available",
+      },
+      {
+        title: "Polynomial Regression",
+        description: "Fit polynomial curves and select complexity using validation data.",
+        href: "/learn/ml/polynomial-regression",
+        status: "available",
+      },
+      {
         title: "Gradient Descent",
         description: "See how optimization moves toward lower loss — one step at a time.",
         href: "/learn/ml/gradient-descent",

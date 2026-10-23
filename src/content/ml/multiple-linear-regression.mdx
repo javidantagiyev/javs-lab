@@ -1,0 +1,266 @@
+import Link from "next/link";
+import LessonWorkbench from "@/components/learning/LessonWorkbench";
+import MultipleRegressionLab from "@/components/labs/MultipleRegressionLab";
+import MultipleRegressionQuiz from "@/components/learning/MultipleRegressionQuiz";
+
+## Predict With More Than One Input
+
+In <Link href="/learn/ml/linear-regression">Lesson 08 — Linear Regression</Link>, we used a single input feature to predict a numerical value. But most useful predictions involve **several pieces of information at the same time**.
+
+Imagine estimating an apartment's price. Floor area tells us something, but two equally sized apartments may have different prices if one is in a newer building. We might use **floor area** and **building age** together rather than expecting one feature to explain everything.
+
+This is **multiple linear regression**: a linear model with **two or more input features**, predicting one numerical target. The word *multiple* refers to the inputs, not the number of outputs. Our example is entirely fictional, and the resulting prices are **not real estate advice**.
+
+This lesson develops the multi-feature model, interprets its coefficients, shows how ordinary least squares fits them, and examines correlated features and omitted variables. The mathematical foundation follows **Aurélien Géron, *Hands-On Machine Learning*, 3rd edition**, Chapter 4, “Linear Regression” (pp. 132–137).
+
+## Learning Objectives
+
+By the end, you will be able to:
+
+1. Write a linear regression equation with multiple input features.
+2. Interpret each coefficient **while the other features are held fixed**.
+3. Calculate a prediction, a residual, and the mean squared error.
+4. Understand how a *design matrix* represents the full dataset.
+5. Fit coefficients by minimizing squared residuals, and recognize when a unique solution may not exist.
+6. Compare a model with one feature against a model with two features.
+7. Evaluate predictions on a **held-out dataset** without using those samples to fit the coefficients.
+
+## 1. The Multiple Linear Regression Model
+
+For two inputs, the model is:
+
+$$
+\hat{y}=\theta_0+\theta_1x_1+\theta_2x_2
+$$
+
+For our fictional apartments:
+
+| Symbol | What it represents | Unit |
+| --- | --- | --- |
+| $x_1$ | Floor area | Square metres ($\mathrm{m}^2$) |
+| $x_2$ | Building age | Years |
+| $y$ | Observed apartment price | Thousands of AZN |
+| $\hat{y}$ | Model-predicted price | Thousands of AZN |
+| $\theta_0$ | Intercept | Thousands of AZN |
+| $\theta_1$ | Area coefficient | Thousands of AZN per $\mathrm{m}^2$ |
+| $\theta_2$ | Age coefficient | Thousands of AZN per year |
+
+The intercept is the prediction when **every feature equals zero**. It is part of the mathematical model, but may have no practical interpretation if such a property is outside the observed data.
+
+### Worked example — Predict an apartment price
+
+Suppose a model has been fitted with the following coefficients:
+
+$$
+\hat{y}=25+2x_1-0.5x_2
+$$
+
+Consider an apartment with **80 m²** of area in a **10-year-old building**:
+
+$$
+\begin{aligned}
+\hat{y}&=25+2(80)-0.5(10)\\
+&=25+160-5\\
+&=180
+\end{aligned}
+$$
+
+The prediction is **180 thousand AZN**, or **180,000 AZN**.
+
+Notice that each feature contributes independently to the *formula*. That does **not** mean the features are statistically independent in the dataset.
+
+## 2. Interpret the Coefficients Correctly
+
+The area coefficient $\theta_1=2$ says that **if we compare two inputs with the same age**, increasing floor area by one square metre increases this model's prediction by 2 thousand AZN.
+
+The age coefficient $\theta_2=-0.5$ says that **if area is fixed**, increasing building age by one year decreases the model's prediction by 0.5 thousand AZN.
+
+For example, increasing age from 10 to 15 years, with area unchanged, changes the model's prediction by:
+
+$$
+\Delta\hat{y}=(-0.5)(15-10)=-2.5
+$$
+
+That is a decrease of **2.5 thousand AZN**. We do not have to refit the model to calculate the effect of changing its inputs.
+
+**Critical distinction:** A regression coefficient describes an **association in the fitted model, conditional on its other features**. It does *not* prove that making a building older would cause its market price to fall by exactly that amount. Location, renovations, building quality, and many other unmeasured factors may affect the relationship.
+
+Also remember that coefficients have **units**. Comparing the raw magnitude of an area coefficient with that of an age coefficient is not a reliable measure of feature importance: a one-year change and a one-square-metre change are different quantities.
+
+## 3. From Individual Examples to a Design Matrix
+
+A dataset with $m$ training examples and $n$ features can be represented by an input matrix $X$. For each example, we place a leading **1** before its feature values so that the intercept is included in matrix multiplication.
+
+For three hypothetical apartments, the design matrix could be:
+
+$$
+X=\begin{bmatrix}
+1 & 60 & 5\\
+1 & 80 & 10\\
+1 & 100 & 20
+\end{bmatrix}
+\qquad
+\boldsymbol\theta=\begin{bmatrix}\theta_0\\\theta_1\\\theta_2\end{bmatrix}
+$$
+
+Then the vector of model predictions is:
+
+$$
+\hat{\mathbf y}=X\boldsymbol\theta
+$$
+
+Every **row** represents an apartment. Every **feature column** contains a measurement. Every coefficient is shared across all apartments; we do not invent a separate model for each row.
+
+In general, the prediction for an example is a dot product:
+
+$$
+\hat{y}^{(i)}=\boldsymbol\theta^{\mathsf T}\mathbf x^{(i)}
+$$
+
+The extra constant feature $x_0=1$ multiplies the intercept. This compact vector notation becomes useful when working with many features and algorithms such as gradient descent or neural networks.
+
+## 4. How the Model Learns the Coefficients
+
+A training example contains an observed price $y^{(i)}$. Once we choose a model, it predicts $\hat y^{(i)}$. Their difference is the **residual**:
+
+$$
+r_i=y^{(i)}-\hat{y}^{(i)}
+$$
+
+The training objective is usually **mean squared error (MSE)**:
+
+$$
+\mathrm{MSE}(\boldsymbol\theta)
+=\frac{1}{m}\sum_{i=1}^{m}\left(y^{(i)}-\boldsymbol\theta^{\mathsf T}\mathbf x^{(i)}\right)^2
+$$
+
+The model should find coefficients that make this quantity as small as possible on the **training rows**. This is the same squared-error principle introduced in <Link href="/learn/ml/loss-functions">Lesson 09 — Loss Functions</Link>. The difference is that we now adjust *three* parameters instead of two.
+
+### Ordinary least squares (OLS)
+
+For a full-column-rank design matrix, one mathematical expression for the minimizing coefficients is the **Normal Equation**:
+
+$$
+\hat{\boldsymbol\theta}=(X^{\mathsf T}X)^{-1}X^{\mathsf T}\mathbf y
+$$
+
+Here $X^{\mathsf T}$ is the transpose of $X$, and $^{-1}$ denotes a matrix inverse. The expression is **not valid when $X^{\mathsf T}X$ is singular**. Real software often solves least-squares problems using more robust factorizations such as QR or singular value decomposition (SVD), rather than explicitly computing the inverse.
+
+Our browser lab solves the small least-squares normal system with **partial-pivoting elimination** and reports when a unique solution cannot be identified. It does not call a machine-learning API, and it does not claim that an ill-conditioned system is solved as robustly as a mature numerical library.
+
+Another approach is to start with initial coefficients and update them repeatedly using **gradient descent**:
+
+$$
+\boldsymbol\theta\leftarrow\boldsymbol\theta-\eta\nabla_{\boldsymbol\theta}\mathrm{MSE}(\boldsymbol\theta)
+$$
+
+We studied that idea in <Link href="/learn/ml/gradient-descent">Lesson 10 — Gradient Descent</Link>. Both OLS and gradient descent can seek the minimum of the **same linear-regression squared-error objective**, but they use different numerical procedures.
+
+## 5. Why Adding a Feature Can Change Other Coefficients
+
+A coefficient estimated with only area in the model answers a different question from an area coefficient estimated while controlling for building age.
+
+Suppose larger apartments in your sample also tend to be **newer**. If you omit building age, the area-only model may partly absorb the information carried by age. When age is added, both coefficients may shift because OLS is solving a different optimization problem.
+
+This is the idea behind **omitted-variable effects**. Removing a feature does not simply delete its term from an already fitted model: we need to **fit the remaining coefficients again**.
+
+### Correlated features and multicollinearity
+
+If area and age are strongly related, the dataset contains less independent information about their separate associations with price. Two distinct coefficient combinations might produce very similar fitted prices.
+
+When the columns are perfectly linearly dependent (once the intercept is included), the data do not determine a unique OLS coefficient vector. When they are **nearly** dependent, estimates can become highly sensitive to small data changes. This is called **multicollinearity**.
+
+In the lab, choose **Correlated features**, include both inputs, and compare the resulting coefficients with those from the **Mixed area + age** dataset. The warnings and correlation statistic help you recognize when interpretation becomes difficult. The correlation statistic does not itself prove that the coefficients are inaccurate, but it is a useful diagnostic.
+
+## 6. Training Performance Is Not Generalization
+
+A flexible or carefully fitted model can make its training error small without necessarily performing well on new apartments. This is why <Link href="/learn/ml/training-validation-and-testing">Lesson 05 — Training, Validation, and Testing</Link> kept evaluation examples separate from training.
+
+Our experiment has a fixed, disclosed split of **14 training apartments** and **4 holdout apartments**. The fitting calculation sees only the training rows. The holdout observations are used only to compute separate predictions and errors, never to calculate OLS coefficients.
+
+**RMSE** has the same units as the target:
+
+$$
+\mathrm{RMSE}=\sqrt{\frac{1}{m}\sum_{i=1}^m\left(y^{(i)}-\hat y^{(i)}\right)^2}
+$$
+
+The plot places **observed prices on the horizontal axis** and **predicted prices on the vertical axis**. A point exactly on the diagonal is predicted perfectly; its vertical distance from that diagonal reflects its residual.
+
+Both displayed RMSE values are **descriptive results on a small synthetic dataset**, not evidence of real-world apartment-price accuracy. Avoid tuning your model by repeatedly selecting whichever option performs best on the holdout; doing that turns the holdout into a validation set and weakens its independence.
+
+## 7. When Multiple Linear Regression Is Useful—and When It Isn't
+
+Multiple regression works well as an **interpretable baseline** when relationships are approximately additive and linear in the chosen parameters. It can handle many numeric features and can also use encoded categorical inputs.
+
+But adding more columns does not guarantee better generalization. Potential limitations include:
+
+- Important predictors are missing or measured poorly.
+- The relationship is curved, changes across groups, or depends on **interactions** between features.
+- Training observations are too few for the number of parameters.
+- Predictors are highly correlated, making individual coefficients unstable.
+- Outliers or distribution shifts make training results misleading.
+
+We'll explore curved terms in **Lesson 12 — Polynomial Regression**, and coefficient penalties in **Lesson 13 — Regularization**. In practice, you should also consider a validation strategy, feature transformations, and the real purpose of the prediction before using this model to support a decision.
+
+<LessonWorkbench lab={<MultipleRegressionLab />} name="Multiple Linear Regression — Two-Feature Studio">
+
+## Lab Guide
+
+**Two Features. One Prediction.** The experiment uses a fictional apartment dataset. Prices are expressed in **thousands of AZN**, area in square metres, and building age in years. The scatterplot shows **actual price versus predicted price**; the dashed diagonal marks perfect predictions.
+
+### Mission 01 — Fit it manually
+
+Start with **Mixed area + age** and both input checkboxes enabled. Adjust the **Intercept**, **Area weight**, and **Age weight** sliders. Watch the live equation, the actual-versus-predicted points, and training RMSE. Try to improve the predictions *before* asking for the least-squares solution.
+
+Now select **Fit ordinary least squares**. It calculates the training-set coefficients directly. Compare the new training RMSE with your manual estimate. Why does the intercept matter even when both feature weights are reasonable?
+
+### Mission 02 — Change one input, hold the other fixed
+
+Use the **What-if prediction** sliders at the bottom. Set area to 100 m² and age to 10 years, then increase age by 5 years without changing area. Which term in the equation accounts for the resulting difference? Reset the age slider and change area instead.
+
+Try the same experiment after turning off the age input. Does building age still affect the prediction? This illustrates how a feature only affects a fitted linear model when it is included.
+
+### Mission 03 — Remove a feature and refit
+
+With both inputs enabled, press **Fit ordinary least squares** and note the fitted area coefficient. Turn off building age, then fit the model again. Observe the change in the area coefficient and the training and holdout RMSE values.
+
+Repeat with only building age enabled, and finally with **both inputs disabled**. The last model predicts the training mean for every apartment: it is an **intercept-only baseline**.
+
+### Mission 04 — Introduce an unusual observation
+
+Select **Unusual price / outlier**. Compare the fitted model with the original mixed scenario. Watch what happens to the RMSE and coefficients. Squared errors put substantial weight on very large residuals, so a single unusual observation may influence the fitted solution.
+
+A surprising data point is not automatically a mistake. In a real dataset, first investigate why it differs from other observations.
+
+### Mission 05 — Investigate correlated features
+
+Select **Correlated features**, leave both features enabled, and examine **AREA–AGE r** and any warning message. Fit the model, then remove one feature and fit again. Which numbers become more difficult to interpret when two inputs contain largely overlapping information?
+
+Finally, enable **Show holdout points**. Compare **Train RMSE** and **Holdout RMSE**, and explain why the second number cannot be used to justify real-world predictive performance without stronger evidence.
+
+</LessonWorkbench>
+
+## Quiz
+
+<MultipleRegressionQuiz />
+
+## Key Takeaways
+
+- **Multiple linear regression** predicts one numerical target using two or more inputs and shared coefficients.
+- A feature coefficient represents the model's predicted change **when the other included features are held fixed**.
+- **OLS** chooses coefficients that minimize the training sum of squared residuals; it can be computed directly or approached with iterative optimization.
+- **Correlated predictors** may lead to unstable, difficult-to-interpret individual coefficients; perfect column dependence prevents a unique unregularized solution.
+- Removing a feature requires **refitting** the remaining coefficients, and can change their values.
+- **Training** and **holdout** errors answer different questions. Good training fit does not guarantee generalization or causality.
+
+## References
+
+**Primary textbook:** Aurélien Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 3rd edition, O'Reilly, Chapter 4, **“Linear Regression”**, pp. **132–137**, especially the multi-feature linear model, vector notation, MSE, the Normal Equation, and least-squares solutions.
+
+**Supporting textbook sections:** Géron, Chapter 2, **“Select a Performance Measure”** and **“Create a Test Set”** (pp. 43–60), plus the preprocessing discussion (pp. 67–87), for evaluation and feature handling.
+
+**Code reference:** <Link href="https://github.com/ageron/handson-ml3">Géron's official *Hands-On ML 3e* companion notebooks ↗</Link>. The narrative, synthetic data, exercises, and TypeScript lab on Jav's Lab are original adaptations for teaching rather than reproductions of the book.
+
+**Previous:** <Link href="/learn/ml/gradient-descent">10 — Gradient Descent</Link>  
+**Course:** <Link href="/subjects/ml">Machine Learning modules ↗</Link>  
+**Next:** 12 — Polynomial Regression *(planned)*
